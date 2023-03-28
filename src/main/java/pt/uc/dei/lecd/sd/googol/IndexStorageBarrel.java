@@ -1,117 +1,167 @@
 package pt.uc.dei.lecd.sd.googol;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
-import lombok.extern.slf4j.Slf4j;
 @Slf4j
-public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel {
-    private static final long serialVersionUID = 1L;
+public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel{
 
-    private HashMap<String, HashSet<String>> invertedIndex;
+	private static final long serialVersionUID = 1L;
+	
+	private HashMap<String, HashSet<String>> invertedIndex;
     private HashMap<String, String> pageTitles;
     private HashMap<String, String> pageContents;
     private HashMap<String, ArrayList<String>> pageLinks;
     private HashMap<String, Integer> pageLinkCounts;
-
+    private ArrayList<String> urlsQueue;
+    private HashSet<String> indexedUrls;    
+    
     public IndexStorageBarrel() throws RemoteException {
-        this.invertedIndex = new HashMap<>();
+    	this.invertedIndex = new HashMap<>();
         this.pageTitles = new HashMap<>();
         this.pageContents = new HashMap<>();
         this.pageLinks = new HashMap<>();
         this.pageLinkCounts = new HashMap<>();
+        this.urlsQueue = new ArrayList<>();
+        this.indexedUrls = new HashSet<>();
     }
-
-    public void addPage(String url, String title, String content, ArrayList<String> links) {
-        // Adicionar o título e conteúdo da página aos seus respectivos HashMaps
-        pageTitles.put(url, title);
-        pageContents.put(url, content);
-        pageLinks.put(url, links);
-
-        // Adicionar cada termo da página ao índice invertido
-        for (String term : content.split("\\s+")) {
-            term = term.toLowerCase();
-            // o método getOrDefault retorna o valor associado à chave no mapa, ou se a
-            // chave não existir
-            // no mapa retorna null
-            HashSet<String> urls = invertedIndex.getOrDefault(term, null);
-            urls.add(url);
-            invertedIndex.put(term, urls);
-        }
-
-        // Atualizar o número de ligações da página linkada
-        for (String link : links) {
-            Integer num = pageLinkCounts.getOrDefault(link, 0);
-            pageLinkCounts.put(link, num + 1);
-
-        }
+    
+    public static void main(String[] args) throws RemoteException {
+	    int tentativas = 0;
+    	while (tentativas < 5) {
+    		try {
+	    		IndexStorageBarrel sb = new IndexStorageBarrel();
+	    		LocateRegistry.createRegistry(1099).rebind("IndexStorageBarrel", sb);
+	    		System.out.println("Armazenamento iniciado ...");
+	    		break;
+	    		
+	    	} catch (RemoteException re) {
+	    		System.out.println("Erro ao iniciao o armazenamento: " + re.getMessage());
+	    		System.out.println("Tentando se reconectar em 5 segundos...");
+	    		
+	    		try {
+	    			Thread.sleep(5000);
+	    		
+	    		} catch (InterruptedException ie) {
+	    			Thread.currentThread().interrupt();
+	    		}
+	    		tentativas ++;
+	    	}
+    	}
+    	
+    	if(tentativas == 5) {
+    		System.out.println("Não foi possível iniciar o armazenamento após 5 tentativas.");
+    	}    
     }
-
+       
+    public void addToIndex(String term, String url) { 
+		HashSet<String> urls = invertedIndex.get(term); 
+		if (urls == null) {
+			urls = new HashSet<String>();
+			invertedIndex.put(term,  urls);
+		}
+		urls.add(url);
+    }  
+    
+    // Adicionar titulo do url
+    public void addPageTitle(String url, String title) {
+    	pageTitles.put(url, title);
+    }
+    
+    // Adicionar o conteudo da página
+    public void addPageContents(String url, String text) {
+    	pageContents.put(url, text);
+    }
+    
+    // Adicionar a lista de links "encontrados" em cada página
+    public void addPageLinks(String url, ArrayList<String> links) {
+    	pageLinks.put(url, links);
+    }
+    
+    // retornar os urls da fila
+    public ArrayList<String> getQueue (){
+    	return urlsQueue;
+    }
+    
+    // atualização da fila
+    public void newQueue(ArrayList<String> newQueue) {
+    	this.urlsQueue = newQueue;
+    }
+    
+    public void addIndexedUrl(String url) {
+    	this.indexedUrls.add(url);
+    }
+    
+    // adicionar um url à fila, que ainda não tenha sido indexado
+    public void addToQueue(String url) {
+    	if(!indexedUrls.contains(url))
+    		this.urlsQueue.add(url);
+    		
+    }
+    
+    // Atualizar o número de ligações da página linkada
+    public void urlConnections(String url) {
+    	Integer num = pageLinkCounts.getOrDefault(url, 0);
+        pageLinkCounts.put(url, num + 1);
+    }
+    
+    
     // Retornar a lista de URLs que contenham o termo procurado
-    public HashSet<String> searchTerm(String term) {
+    public HashSet<String> searchTerm(String term)  {
         return invertedIndex.getOrDefault(term.toLowerCase(), null);
     }
-
+    
     // Retornar a lista de URLs que contenham um conjunto de termos
-    public LinkedHashMap<Integer, String> searchTerms(String terms) {
+    public HashSet <String> searchTerms(String terms)  {
         StringTokenizer tokens = new StringTokenizer(terms, " ,:/.?'_");
         HashSet<String> results = searchTerm(tokens.nextToken());
-        if (results == null)
-            return null;
-
-        while (tokens.hasMoreElements()) {
-            HashSet<String> token_result = searchTerm(tokens.nextToken());
-            token_result.retainAll(results);
-            if (token_result.size() == 0)
-                return null;
-
-            results = token_result;
-        }
+        if(results == null)
+        	return null;
+        
+        while(tokens.hasMoreElements()) {
+        	HashSet<String> token_result = searchTerm(tokens.nextToken());
+        	token_result.retainAll(results);
+        	if (token_result.size() == 0)
+        		return null;
+        	
+        	results = token_result;
+        }  
         return sortImp(results);
     }
-
+    
     // ordenar os resultados da pesquisa por importancia
-    public LinkedHashMap<Integer, String> sortImp(HashSet<String> results) {
-        LinkedHashMap<Integer, String> sortedImp = new LinkedHashMap<>();
-        int max, count;
-        String mostRelevant;
-        for (int i = 1; i <= results.size(); i++) {
-            max = 0;
-            count = i;
-            mostRelevant = "";
-            for (String result : results) {
-                if (!sortedImp.containsValue(result) && pageLinkCounts.get(result) >= max) {
-                    max = pageLinkCounts.get(result);
-                    mostRelevant = result;
-                }
-            }
-            sortedImp.put(count, mostRelevant);
-        }
-        return sortedImp;
-    }
-
-    public String getPageTitle(String url) {
+    public HashSet <String> sortImp(HashSet <String> results) {
+    	HashSet <String> sortedImp = new HashSet<>();
+    	int max;
+    	String greaterImportance;
+    	for(int i=1; i<=results.size(); i++) {
+    		max=0;
+    		greaterImportance = "";
+    		for(String result: results) {
+    			if(!sortedImp.contains(result) && pageLinkCounts.get(result) >= max) {
+    				max = pageLinkCounts.get(result);
+    				greaterImportance = result;
+    			}
+    		}
+    	sortedImp.add(greaterImportance);
+    	}
+    	return sortedImp;
+    }   
+    
+    public String getPageTitle(String url)  {
         // Retornar o título da página correspondente à URL fornecida
         return pageTitles.get(url);
     }
 
-    public String getPageContent(String url) {
-        // Retornar o conteúdo da página correspondente à URL fornecida
-        return pageContents.get(url);
-    }
-
-    public ArrayList<String> getLinksToPage(String url) {
-        // Retornar a lista de links da página correspondente à URL fornecida
-        return pageLinks.get(url);
-    }
-
     // Consultar lista de páginas com ligação para uma página específica
-    public ArrayList<String> getPagesWithLinkTo(String url) {
+    public ArrayList<String> getPagesWithLinkTo(String url){
         ArrayList<String> pagesWithLink = new ArrayList<String>();
         for (String pageUrl : pageLinks.keySet()) {
             ArrayList<String> links = pageLinks.get(pageUrl);
@@ -121,17 +171,21 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         }
         return pagesWithLink;
     }
-    // Este método percorre todas as páginas armazenadas em pageLinks
-    // e verifica se cada uma contém um link para a página especificada pelo
-    // parâmetro url.
-    // Se uma página contém um link para essa página, seu URL é adicionado à lista
-    // pagesWithLink.
+    // Este método percorre todas as páginas armazenadas em pageLinks 
+    // e verifica se cada uma contém um link para a página especificada pelo parâmetro url. 
+    // Se uma página contém um link para essa página, seu URL é adicionado à lista pagesWithLink. 
     // Finalmente, a lista é retornada como resultado da consulta.
-
+    
+    public String getShortQuote(String url) {
+    	String text = pageContents.get(url);
+    	// Obter a citação com os primeiros 50 caracteres e adiciona "..." no final para indicar que há mais texto a seguir.
+    	String shortQuote = text.substring(0, Math.min(text.length(), 50)) + "...";
+    	
+    	return shortQuote;
+    }
     @Override
     public String ping() throws RemoteException {
         log.info("ping was called, answering pong.");
         return "pong";
     }
-
 }

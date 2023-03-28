@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 
 /**
  * Essa interface é usada para permitir que outras classes, que podem estar em
@@ -19,20 +18,35 @@ import java.util.LinkedHashMap;
  */
 public interface InterfaceBarrel extends Remote {
 
-    void addPage(String url, String title, String content, ArrayList<String> links) throws RemoteException;
+	void addToIndex(String term, String url);
+	
+	void addPageTitle(String url, String title);
+	
+	void addPageContents(String url, String text);
+	
+	void addPageLinks(String url, ArrayList<String> links);
+	
+	ArrayList<String> getQueue ();
+	
+	void newQueue(ArrayList<String> newQueue);
+	
+	void addIndexedUrl(String url);
+	
+	void addToQueue(String url);
+	
+	void urlConnections(String url);
+	
+	HashSet<String> searchTerm(String term);
+	
+	HashSet <String> searchTerms(String terms);
+	
+	HashSet <String> sortImp(HashSet <String> results);
+	
+	String getPageTitle(String url);
+	
+	ArrayList<String> getPagesWithLinkTo(String url);
+	
+	String getShortQuote(String url);
 
-    HashSet<String> searchTerm(String term) throws RemoteException;
-
-    LinkedHashMap<Integer, String> searchTerms(String term) throws RemoteException;
-
-    LinkedHashMap<Integer, String> sortImp(HashSet<String> results) throws RemoteException;
-
-    String getPageTitle(String url) throws RemoteException;
-
-    String getPageContent(String url) throws RemoteException;
-
-    ArrayList<String> getLinksToPage(String url) throws RemoteException;
-
-    String ping() throws RemoteException;
-
+	String ping() throws RemoteException;
 }

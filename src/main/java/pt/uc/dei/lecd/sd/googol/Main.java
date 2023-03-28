@@ -1,4 +1,4 @@
-package pt.uc.dei;
+package pt.uc.dei.lecd.sd.googol;
 
 public class Main {
     public static void main(String[] args) {

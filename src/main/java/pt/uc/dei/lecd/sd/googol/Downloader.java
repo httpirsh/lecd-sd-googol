@@ -1,4 +1,4 @@
-package pt.uc.dei;
+package pt.uc.dei.lecd.sd.googol;
 
 import java.io.IOException;
 import java.net.URL;

@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel {
     private static final long serialVersionUID = 1L;
 
@@ -128,6 +130,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
 
     @Override
     public String ping() throws RemoteException {
+        log.info("ping was called, answering pong.");
         return "pong";
     }
 

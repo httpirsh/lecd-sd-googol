@@ -1,10 +1,10 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import java.net.MalformedURLException;
-import java.net.http.WebSocket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Client {
@@ -20,7 +20,7 @@ public class Client {
     	}
 	private final InterfaceBarrel barrel;
 
-	public Client(InterfaceBarrel barrel) {
+	public Client(InterfaceBarrel barrel) throws MalformedURLException, NotBoundException, RemoteException {
 		this.barrel = barrel;
 	}
 
@@ -32,45 +32,66 @@ public class Client {
     		// menu com as opções que utilizador pode realizar
     		System.out.println("1. Indexar um novo Url\n"
     				+ "2. Consultar lista de páginas com ligação para uma página específica\n"
-    				+ "3. Sair\n");
+					+ "3. Página de Administração em Tempo Real\n"
+    				+ "4. Sair\n");
     		
     		System.out.println();
             System.out.println("Digite a opção que deseja:");
     	}
 
-    	public static void iniciar(Scanner sc, InterfaceSearchModule sm) throws RemoteException, NotBoundException, MalformedURLException {
-    		int opcao; 
-    		boolean registoLogin = registoLogin(sc);
-    		do {
-	    		menu();
-	    		opcao = validaInteiro(sc);
-    			sc.nextLine();  
-	            switch(opcao) {
-	                case 1:
-	                	// Indexar um novo url
-	                	System.out.println("Introduza manualmente um URL para ser indexado: ");
-	                	String url = sc.nextLine();
-	                	sm.indexNewURL(url);
-	                	break;
-	                	
-	                case 2:
-	                	// Consultar os resultados da pesquisa
-	                    System.out.print("Digite os termos da pesquisa: ");
-	                    String termos = sc.nextLine();
-	                	sm.searchResults(termos);
-	                	if (registoLogin)
-	                		sm.listPages(termos);
-	                	break;
-	                	
-	                case 3:
-	                	System.out.println("Saíste do programa");
-	                	break;
-	                	
-	                default: 
-	                	System.out.println("Opcão inválida");
-	            }
-    		} while (opcao != 3);
-    	}
+	public static void iniciar(Scanner sc, InterfaceSearchModule sm) throws RemoteException, NotBoundException, MalformedURLException {
+		int opcao;
+		boolean registoLogin = registoLogin(sc);
+		do {
+			menu();
+			opcao = validaInteiro(sc);
+			sc.nextLine();
+			switch(opcao) {
+				case 1:
+					// Indexar um novo url
+					System.out.println("Introduza manualmente um URL para ser indexado: ");
+					String url = sc.nextLine();
+					sm.indexNewURL(url);
+					break;
+
+				case 2:
+					// Consultar os resultados da pesquisa
+					System.out.print("Digite os termos da pesquisa: ");
+					String termos = sc.nextLine();
+					List<String> results = sm.searchResults(termos);
+					if (registoLogin) {
+						sm.listPages(termos);
+					}
+					// Imprime os resultados da pesquisa
+					System.out.println("Resultados da pesquisa: ");
+					for (String result : results) {
+						System.out.println(result);
+					}
+					break;
+
+				case 3:
+
+
+					// Display top 10 searches
+					List<String> top10 = getTop10Searches((RmiSearchModule) sm);
+					System.out.println("Top 10 searches:");
+					for (String search : top10) {
+						System.out.println(search);
+					}
+
+				case 4:
+					System.out.println("Saíste do programa.");
+					break;
+
+				default:
+					System.out.println("Opcão inválida");
+			}
+		} while (opcao != 4);
+	}
+
+	public static List<String> getTop10Searches(RmiSearchModule sm) throws RemoteException {
+		return sm.getTopSearches(10);
+	}
     	
     	public static boolean registoLogin(Scanner sc) {
     	    boolean registo = false;
@@ -90,7 +111,7 @@ public class Client {
     	    	registo = true;
     	    }
     	    
-    	    if(registo) {
+    	    if (registo) {
     	    	System.out.println("Deseja fazer login? (s/n)");
     	    	String log = sc.nextLine();
     	    	if (log.equalsIgnoreCase("s")) {
@@ -136,59 +157,10 @@ public class Client {
             return num;
         }
 
-// ----------------------------------------------------------------------------------------------------------------------------------------
-		private WebSocket socket;
-		private AdminPage adminPage;
-
-		public AdminClient() {
-			// Set up WebSocket connection
-			WebSocketFactory factory = new WebSocketFactory();
-			try {
-				socket = factory.createSocket("ws://localhost:8080/admin");
-				socket.addListener(new WebSocketAdapter() {
-					@Override
-					public void onMessage(WebSocket ws, String message) {
-						// Parse message and update UI accordingly
-						// For example:
-						Gson gson = new Gson();
-						User user = gson.fromJson(message, User.class);
-						adminPage.getUserTable().getItems().add(user);
-					}
-				});
-				socket.connect();
-			} catch (IOException | WebSocketException e) {
-				e.printStackTrace();
-			}
-
-			// Initialize UI
-			adminPage = new AdminPage();
-			adminPage.getSaveButton().setOnAction(e -> {
-				// Send data to server
-				User user = new User(adminPage.getNameField().getText(), adminPage.getEmailField().getText());
-				Gson gson = new Gson();
-				String message = gson.toJson(user);
-				socket.send(message);
-			});
-		}
-
-		public AdminPage getAdminPage() {
-			return adminPage;
-		}
-	}
-
-
-
-
-
-
-
-
-
-
 
 
 }   	
-//}   	
+
     	
     	
 /*    	

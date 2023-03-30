@@ -4,14 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.StringTokenizer;
+import java.util.*;
 
 @Slf4j
-public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel{
+public class IndexStorageBarrel implements InterfaceBarrel{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -23,8 +19,9 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     private ArrayList<String> urlsQueue;
     private HashSet<String> indexedUrls;    
     
-    public IndexStorageBarrel() throws RemoteException {
-    	this.invertedIndex = new HashMap<>();
+    public IndexStorageBarrel(String name) throws RemoteException {
+    	super();
+        this.invertedIndex = new HashMap<>();
         this.pageTitles = new HashMap<>();
         this.pageContents = new HashMap<>();
         this.pageLinks = new HashMap<>();
@@ -39,7 +36,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     		try {
 	    		IndexStorageBarrel sb = new IndexStorageBarrel();
 	    		LocateRegistry.createRegistry(1099).rebind("IndexStorageBarrel", sb);
-	    		System.out.println("Armazenamento iniciado ...");
+	    		System.out.println("Armazenamento iniciado...");
 	    		break;
 	    		
 	    	} catch (RemoteException re) {
@@ -60,15 +57,27 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     		System.out.println("Não foi possível iniciar o armazenamento após 5 tentativas.");
     	}    
     }
-       
-    public void addToIndex(String term, String url) { 
-		HashSet<String> urls = invertedIndex.get(term); 
-		if (urls == null) {
-			urls = new HashSet<String>();
-			invertedIndex.put(term,  urls);
-		}
-		urls.add(url);
-    }  
+
+    private Map<String, Integer> termCounts = new HashMap<>();
+
+
+    @Override
+    public List<String> getSearchHistory() throws RemoteException {
+        return null;
+    }
+
+    public void addToIndex(String term, String url) {
+        HashSet<String> urls = invertedIndex.get(term);
+        if (urls == null) {
+            urls = new HashSet<String>();
+            invertedIndex.put(term,  urls);
+        }
+        urls.add(url);
+
+        // Increment the count for the term
+        termCounts.merge(term, 1, Integer::sum);
+    }
+
     
     // Adicionar titulo do url
     public void addPageTitle(String url, String title) {
@@ -183,6 +192,8 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     	
     	return shortQuote;
     }
+
+
     @Override
     public String ping() throws RemoteException {
         log.info("ping was called, answering pong.");

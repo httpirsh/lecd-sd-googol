@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Essa interface é usada para permitir que outras classes, que podem estar em
@@ -18,35 +19,38 @@ import java.util.HashSet;
  */
 public interface InterfaceBarrel extends Remote {
 
+	List<String> getSearchHistory() throws RemoteException;
+
 	void addToIndex(String term, String url);
-	
+
 	void addPageTitle(String url, String title);
-	
+
 	void addPageContents(String url, String text);
-	
+
 	void addPageLinks(String url, ArrayList<String> links);
-	
-	ArrayList<String> getQueue ();
-	
+
+	ArrayList<String> getQueue();
+
 	void newQueue(ArrayList<String> newQueue);
-	
+
 	void addIndexedUrl(String url);
-	
+
 	void addToQueue(String url);
-	
+
 	void urlConnections(String url);
-	
+
 	HashSet<String> searchTerm(String term);
-	
-	HashSet <String> searchTerms(String terms);
-	
-	HashSet <String> sortImp(HashSet <String> results);
-	
+
+	HashSet<String> searchTerms(String terms);
+
+	HashSet<String> sortImp(HashSet<String> results);
+
 	String getPageTitle(String url);
-	
+
 	ArrayList<String> getPagesWithLinkTo(String url);
-	
+
 	String getShortQuote(String url);
 
 	String ping() throws RemoteException;
 }
+

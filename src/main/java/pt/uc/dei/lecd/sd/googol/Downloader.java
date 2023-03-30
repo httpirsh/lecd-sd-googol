@@ -150,8 +150,10 @@ public class Downloader implements Remote, Runnable {
     }
 
     public void start() {
-        if (!running)
-            (new Thread(this)).start();
+        if (!running) {
+            Thread t = new Thread(this);
+            t.start();
+        }
     }
 
     @Override

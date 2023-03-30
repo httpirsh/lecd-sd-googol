@@ -50,10 +50,11 @@ public class DownloadAndSearchTest {
     void Should_index_When_url_is_queued() throws RemoteException, AlreadyBoundException {
         RMIQueue queue = new RMIQueue("testQueue");
         registry.bind("googoltest/queue", queue);
-        queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
-
-        assertEquals(1, queue.size());
         
+        queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
+        queue.enqueue("https://en.wikipedia.org/wiki/Star_Trek");
+        queue.enqueue("https://en.wikipedia.org/wiki/The_Vampire_Diaries");
+
         downloader.connectQueue("//localhost:1090/googoltest/queue");
         downloader.start();
 

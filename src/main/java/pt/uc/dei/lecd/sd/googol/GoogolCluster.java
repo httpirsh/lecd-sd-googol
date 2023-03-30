@@ -31,7 +31,7 @@ public class GoogolCluster {
         registry.rebind("googol/downloaders/downloader_2", new Downloader("downloader_2"));
         log.info("Downloader {} bound at {}", "downloader_2", "googol/downloaders/downloader_2");
 
-        registry.rebind("googol/queue", new Queue("queue"));
+        registry.rebind("googol/queue", new RMIQueue("queue"));
         log.info("Queue {} bound at {}", "queue", "googol/queue");
     }
     public static void main(String[] args) {

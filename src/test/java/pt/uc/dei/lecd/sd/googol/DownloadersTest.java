@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class DownloadersTest {

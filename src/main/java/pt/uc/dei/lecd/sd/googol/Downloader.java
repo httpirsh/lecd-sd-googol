@@ -43,36 +43,6 @@ public class Downloader implements Remote {
 	 * Caso ocorra uma exceção ao atualizar o índice com o Storage Barrel, o programa tentará reconectar por 
 	 * até cinco vezes antes de encerrar a execução.
 	 */
-		
-//	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-//
-//		int tentativas = 0;
-//		while (tentativas < 5) {
-//			try {
-//				InterfaceBarrel ba = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel");
-//
-//				String url = getNextURL(ba);
-//				indexURL(url);
-//				System.out.println("Índice atualizado ...");
-//	    		break;
-//
-//			} catch (RemoteException re) {
-//	    		System.out.println("Erro ao atualizar índice: " + re.getMessage());
-//	    		System.out.println("Tentando se reconectar em 5 segundos...");
-//
-//	    		try {
-//	    			Thread.sleep(5000);
-//
-//	    		} catch (InterruptedException ie) {
-//	    			Thread.currentThread().interrupt();
-//	    		}
-//	    		tentativas ++;
-//	    	}
-//    	}
-//
-//    	if(tentativas == 5)
-//    		System.out.println("Não foi possível atualizar o índice após 5 tentativas.");
-//	}
 	
 	/**
 	 * O método indexURL tem como objetivo fazer o download da página web a partir de uma determinada URL, 

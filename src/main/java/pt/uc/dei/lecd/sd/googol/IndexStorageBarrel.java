@@ -10,17 +10,20 @@ import java.util.*;
 public class IndexStorageBarrel implements InterfaceBarrel{
 
 	private static final long serialVersionUID = 1L;
-	
-	private HashMap<String, HashSet<String>> invertedIndex;
-    private HashMap<String, String> pageTitles;
-    private HashMap<String, String> pageContents;
-    private HashMap<String, ArrayList<String>> pageLinks;
-    private HashMap<String, Integer> pageLinkCounts;
+    private final String name;
+
+    private final HashMap<String, HashSet<String>> invertedIndex;
+    private final HashMap<String, String> pageTitles;
+    private final HashMap<String, String> pageContents;
+    private final HashMap<String, ArrayList<String>> pageLinks;
+    private final HashMap<String, Integer> pageLinkCounts;
     private ArrayList<String> urlsQueue;
-    private HashSet<String> indexedUrls;    
-    
+    private final HashSet<String> indexedUrls;
+
+    private final Map<String, Integer> termCounts;
+
     public IndexStorageBarrel(String name) throws RemoteException {
-    	super();
+        this.name = name;
         this.invertedIndex = new HashMap<>();
         this.pageTitles = new HashMap<>();
         this.pageContents = new HashMap<>();
@@ -28,37 +31,9 @@ public class IndexStorageBarrel implements InterfaceBarrel{
         this.pageLinkCounts = new HashMap<>();
         this.urlsQueue = new ArrayList<>();
         this.indexedUrls = new HashSet<>();
-    }
-    
-    public static void main(String[] args) throws RemoteException {
-	    int tentativas = 0;
-    	while (tentativas < 5) {
-    		try {
-	    		IndexStorageBarrel sb = new IndexStorageBarrel();
-	    		LocateRegistry.createRegistry(1099).rebind("IndexStorageBarrel", sb);
-	    		System.out.println("Armazenamento iniciado...");
-	    		break;
-	    		
-	    	} catch (RemoteException re) {
-	    		System.out.println("Erro ao iniciao o armazenamento: " + re.getMessage());
-	    		System.out.println("Tentando se reconectar em 5 segundos...");
-	    		
-	    		try {
-	    			Thread.sleep(5000);
-	    		
-	    		} catch (InterruptedException ie) {
-	    			Thread.currentThread().interrupt();
-	    		}
-	    		tentativas ++;
-	    	}
-    	}
-    	
-    	if(tentativas == 5) {
-    		System.out.println("Não foi possível iniciar o armazenamento após 5 tentativas.");
-    	}    
+        this.termCounts = new HashMap<>();
     }
 
-    private Map<String, Integer> termCounts = new HashMap<>();
 
 
     @Override
@@ -195,7 +170,7 @@ public class IndexStorageBarrel implements InterfaceBarrel{
 
 
     @Override
-    public String ping() throws RemoteException {
+    public String ping() {
         log.info("ping was called, answering pong.");
         return "pong";
     }

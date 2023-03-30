@@ -9,6 +9,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,9 +26,11 @@ import org.jsoup.select.Elements;
  * Cada URL é indexado apenas por um Downloader que irá passar os resultados para os Storage Barrels.
  * 
  */
+@Slf4j
 public class Downloader implements Remote {
 
 	private final String name;
+	private IndexStorageBarrel barrel;
 
 	public Downloader(String name) {
 		this.name = name;
@@ -40,48 +44,56 @@ public class Downloader implements Remote {
 	 * até cinco vezes antes de encerrar a execução.
 	 */
 		
-	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-		
-		int tentativas = 0;
-		while (tentativas < 5) {
-			try {
-				InterfaceBarrel ba = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel");
-				
-				String url = getNextURL(ba);
-				indexURL(url, ba);
-				System.out.println("Índice atualizado ...");
-	    		break;
-			
-			} catch (RemoteException re) {
-	    		System.out.println("Erro ao atualizar índice: " + re.getMessage());
-	    		System.out.println("Tentando se reconectar em 5 segundos...");
-	    		
-	    		try {
-	    			Thread.sleep(5000);
-	    		
-	    		} catch (InterruptedException ie) {
-	    			Thread.currentThread().interrupt();
-	    		}
-	    		tentativas ++;
-	    	}
-    	}
-    	
-    	if(tentativas == 5)
-    		System.out.println("Não foi possível atualizar o índice após 5 tentativas.");	    
-	}
+//	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
+//
+//		int tentativas = 0;
+//		while (tentativas < 5) {
+//			try {
+//				InterfaceBarrel ba = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel");
+//
+//				String url = getNextURL(ba);
+//				indexURL(url);
+//				System.out.println("Índice atualizado ...");
+//	    		break;
+//
+//			} catch (RemoteException re) {
+//	    		System.out.println("Erro ao atualizar índice: " + re.getMessage());
+//	    		System.out.println("Tentando se reconectar em 5 segundos...");
+//
+//	    		try {
+//	    			Thread.sleep(5000);
+//
+//	    		} catch (InterruptedException ie) {
+//	    			Thread.currentThread().interrupt();
+//	    		}
+//	    		tentativas ++;
+//	    	}
+//    	}
+//
+//    	if(tentativas == 5)
+//    		System.out.println("Não foi possível atualizar o índice após 5 tentativas.");
+//	}
 	
 	/**
 	 * O método indexURL tem como objetivo fazer o download da página web a partir de uma determinada URL, 
 	 * extrair informações relevantes da página, atualizar os índices e continuar o processo de indexação 
 	 * recursivamente até que a fila de URLs a serem indexados esteja vazia.
 	 */
-	
-	public static void indexURL(String url, InterfaceBarrel ba) throws RemoteException { 
-        try {
+
+	public void connect(String url) throws MalformedURLException, NotBoundException, RemoteException {
+		log.info("Downloader {} connecting to {}", name, url);
+		this.barrel = (IndexStorageBarrel) Naming.lookup(url);
+	}
+
+
+	public boolean indexURL(String url) throws RemoteException {
 			// download da pagina Web
-	        Document doc = Jsoup.connect(url.toString()).get();
-	        
-	        // titulo da pagina web
+		Document doc = null;
+		try {
+			doc = Jsoup.connect(url.toString()).get();
+
+
+		// titulo da pagina web
 	        String title = doc.title();
 	        
 	        // texto da pagina web
@@ -101,27 +113,26 @@ public class Downloader implements Remote {
 	        StringTokenizer tokens = new StringTokenizer(text, " ,:/.?'_");
 	        while (tokens.hasMoreElements())
 	        	// adicionar a palavra ao indice invertido
-	        	ba.addToIndex(tokens.nextToken().toLowerCase(), url);
+	        	barrel.addToIndex(tokens.nextToken().toLowerCase(), url);
 	        
 	        for (String link: linkList) {
 	        	// Adicionar o link à fila
-	        	ba.addToQueue(link);
+	        	barrel.addToQueue(link);
 	        	// Atualizar o número de ligações da página linkada
-	        	ba.urlConnections(link);
+	        	barrel.urlConnections(link);
 	        }  
 	        
 	        // adicionar o titulo da pagina ao indice 
-	        ba.addPageTitle(url, title);
+	        barrel.addPageTitle(url, title);
 	        // adicionar o texto da pagina ao indice
-	        ba.addPageContents(url, text);
+	        barrel.addPageContents(url, text);
 	        // adicionar os links encontrados na pagina ao indice
-	        ba.addPageLinks(url, linkList);
-        
-        } catch (IOException e) {
-        	e.printStackTrace();
-        }
-        // indexar recursivamente
-        indexURL(getNextURL(ba), ba);
+	        barrel.addPageLinks(url, linkList);
+			return true;
+		} catch (IOException e) {
+			log.error("Unable to index url {}", url, e);
+			return false;
+		}
 	}
 	
 	/**

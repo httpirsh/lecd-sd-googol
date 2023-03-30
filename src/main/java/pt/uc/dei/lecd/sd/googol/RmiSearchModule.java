@@ -50,7 +50,6 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 
 
 	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
-		super();
 		this.name = name;
 	}
 
@@ -82,17 +81,9 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		System.out.println("O novo URL foi indexado");
 	}
 
-	public void listPages(String terms) {
-		HashSet<String> urls = ba.searchTerms(terms);
-		if (urls == null)
-			System.out.println("Não existem páginas que contenham esses termos");
-
-		else {
-			for (String url : urls) {
-				System.out.println("Lista de páginas com ligação ao url " + url);
-				System.out.println(ba.getPagesWithLinkTo(url));
-			}
-		}
+	@Override
+	public String ping() {
+		return "pong";
 	}
 
 	// getBarrels

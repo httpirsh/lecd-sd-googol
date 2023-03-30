@@ -7,25 +7,22 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
 
-public class Client {
-    //public static void main(String[] args) {
-        
+public class RmiClient {
+	private final String name;
+
     	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
-    		
     		Scanner sc = new Scanner(System.in);
-    		//InterfaceBarrel ba = (InterfaceBarrel) Naming.lookup("rmi://localhost/IndexStorageBarrel");
     		InterfaceSearchModule sm = (InterfaceSearchModule) Naming.lookup("rmi://localhost/SearchModule");
     		iniciar(sc, sm);
-    		
     	}
-	private final InterfaceBarrel barrel;
+	private InterfaceSearchModule search;
 
-	public Client(InterfaceBarrel barrel) throws MalformedURLException, NotBoundException, RemoteException {
-		this.barrel = barrel;
+	public RmiClient(String name) {
+		this.name = name;
 	}
 
 	public String callPing() throws RemoteException {
-		return barrel.ping();
+		return search.ping();
 	}
     
     	public static void menu () {
@@ -60,7 +57,7 @@ public class Client {
 					String termos = sc.nextLine();
 					List<String> results = sm.searchResults(termos);
 					if (registoLogin) {
-						sm.listPages(termos);
+						//sm.listPages(termos);
 					}
 					// Imprime os resultados da pesquisa
 					System.out.println("Resultados da pesquisa: ");
@@ -158,46 +155,10 @@ public class Client {
         }
 
 
-
-}   	
-
-    	
-    	
-/*    	
-    	
-    	try {
-            // Procura pelo serviço de busca no RMI Registry
-            InterfaceBarrel searchService = (InterfaceBarrel) Naming.lookup("//localhost/SearchService");
-
-            // Obtém uma lista de termos a partir da entrada do usuário
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("Digite os termos de busca separados por espaços: ");
-            String input = scanner.nextLine();
-            String[] terms = input.split(" ");
-
-            // Realiza a pesquisa no serviço de busca
-            LinkedHashMap <Integer, String> results = searchService.searchTerms(input);
-            
-            
-            // Exibe os resultados da pesquisa
-            System.out.println("Resultados da pesquisa:");
-            for (SearchResult result : results) {
-                System.out.println("URL: " + result.getUrl());
-                System.out.println("Título: " + result.getTitle());
-                System.out.println("Trecho: " + result.getExcerpt());
-                System.out.println("Contagem: " + result.getCount());
-                System.out.println();
-            }
-
-            scanner.close();
-        } catch (Exception e) {
-            System.err.println("Erro: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+	public void connect(String url) throws MalformedURLException, NotBoundException, RemoteException {
+		this.search = (InterfaceSearchModule) Naming.lookup(url);
+	}
 }
-
-*/
 
 
 

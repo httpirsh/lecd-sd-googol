@@ -85,24 +85,27 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	public String ping() {
 		return "pong";
 	}
+//
+//	// getBarrels
+//	// não pode ter nenhuma entrada como input
+//	public List<InterfaceBarrel> getBarrels() throws RemoteException {
+//		List<InterfaceBarrel> barrels = new ArrayList<>();
+//		for (InterfaceBarrel barrel : barrels) {
+//			try {
+//				InterfaceBarrel barrel = (InterfaceBarrel) Naming.lookup("rmi://" + url + ":1099/IndexStorageBarrel");
+//				barrels.add(barrel);
+//			} catch (Exception e) {
+//				System.err.println("Failed to connect to " + url + ": " + e.getMessage());
+//			}
+//		}
+//		return barrels;
+//	}
 
-	// getBarrels
-	public List<InterfaceBarrel> getBarrels (String[] urls) throws RemoteException {
-		List<InterfaceBarrel> barrels = new ArrayList<>();
-		for (String url : urls) {
-			try {
-				InterfaceBarrel barrel = (InterfaceBarrel) Naming.lookup("rmi://" + url + ":1099/IndexStorageBarrel");
-				barrels.add(barrel);
-			} catch (Exception e) {
-				System.err.println("Failed to connect to " + url + ": " + e.getMessage());
-			}
-		}
-		return barrels;
-	}
 
 
 
-	// contar as pesquisas
+
+	// counting searches
 	private Map<String, Integer> getTermCounts() throws RemoteException {
 		Map<String, Integer> termCounts = new HashMap<>();
 

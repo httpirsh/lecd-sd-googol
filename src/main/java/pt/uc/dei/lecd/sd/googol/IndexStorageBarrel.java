@@ -12,7 +12,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
 
 	private static final long serialVersionUID = 1L;
     private final String name;
-
     private final HashMap<String, HashSet<String>> invertedIndex;
     private final HashMap<String, String> pageTitles;
     private final HashMap<String, String> pageContents;
@@ -34,7 +33,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         this.indexedUrls = new HashSet<>();
         this.termCounts = new HashMap<>();
     }
-
 
 
     @Override
@@ -168,6 +166,20 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     	
     	return shortQuote;
     }
+
+    // get downloaders
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Override

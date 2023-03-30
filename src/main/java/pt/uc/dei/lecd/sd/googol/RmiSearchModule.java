@@ -14,43 +14,14 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	private final String name;
 	List<String> searchLogs = new ArrayList<>();
 	private static final long serialVersionUID = 1L;
-	private static InterfaceBarrel ba;
-
-	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-
-		int tentativas = 0;
-		while (tentativas < 5) {
-			try {
-				InterfaceBarrel b1 = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
-
-				RmiSearchModule sm = new RmiSearchModule("search-1");
-				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
-
-				RmiSearchModule.ba = ba;
-
-				System.out.println("RMI Search Module ativo ...");
-
-			} catch (RemoteException | MalformedURLException | NotBoundException re) {
-				System.out.println("Erro ao iniciar o RMI Search Module: " + re.getMessage());
-				System.out.println("Tentando se reconectar em 5 segundos...");
-
-				try {
-					Thread.sleep(5000);
-
-				} catch (InterruptedException ie) {
-					Thread.currentThread().interrupt(); // interrompe a thread atual
-				}
-				tentativas++;
-			}
-		}
-		if (tentativas == 5)
-			System.out.println("Não foi possível ativar o RMI Search Module.");
-
-	}
-
+	private InterfaceBarrel ba;
 
 	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
 		this.name = name;
+	}
+
+	public void connect(String url) throws MalformedURLException, NotBoundException, RemoteException {
+		this.ba = (InterfaceBarrel) Naming.lookup(url);
 	}
 
 	public List<String> searchResults(String terms) throws RemoteException {
@@ -136,4 +107,36 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		}
 		return topTerms;
 	}
+
+//	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
+//
+//		int tentativas = 0;
+//		while (tentativas < 5) {
+//			try {
+//				InterfaceBarrel b1 = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
+//
+//				RmiSearchModule sm = new RmiSearchModule("search-1");
+//				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
+//
+//				RmiSearchModule.ba = ba;
+//
+//				System.out.println("RMI Search Module ativo ...");
+//
+//			} catch (RemoteException | MalformedURLException | NotBoundException re) {
+//				System.out.println("Erro ao iniciar o RMI Search Module: " + re.getMessage());
+//				System.out.println("Tentando se reconectar em 5 segundos...");
+//
+//				try {
+//					Thread.sleep(5000);
+//
+//				} catch (InterruptedException ie) {
+//					Thread.currentThread().interrupt(); // interrompe a thread atual
+//				}
+//				tentativas++;
+//			}
+//		}
+//		if (tentativas == 5)
+//			System.out.println("Não foi possível ativar o RMI Search Module.");
+//
+//	}
 }

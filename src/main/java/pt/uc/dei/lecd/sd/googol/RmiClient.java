@@ -154,7 +154,6 @@ public class RmiClient {
             return num;
         }
 
-
 	public void connect(String url) throws MalformedURLException, NotBoundException, RemoteException {
 		this.search = (InterfaceSearchModule) Naming.lookup(url);
 	}

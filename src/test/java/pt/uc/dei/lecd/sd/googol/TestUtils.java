@@ -6,7 +6,7 @@ import java.rmi.registry.Registry;
 
 public class TestUtils {
     static Registry getRegistryInstance(int port) throws RemoteException {
-        Registry registry = null;
+        Registry registry;
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {

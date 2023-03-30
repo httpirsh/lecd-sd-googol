@@ -4,10 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
 @Slf4j
-public class IndexStorageBarrel implements InterfaceBarrel{
+public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel{
 
 	private static final long serialVersionUID = 1L;
     private final String name;

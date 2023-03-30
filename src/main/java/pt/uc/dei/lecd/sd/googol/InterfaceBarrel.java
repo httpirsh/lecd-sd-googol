@@ -21,36 +21,36 @@ public interface InterfaceBarrel extends Remote {
 
 	List<String> getSearchHistory() throws RemoteException;
 
-	void addToIndex(String term, String url);
+	void addToIndex(String term, String url) throws RemoteException;
 
-	void addPageTitle(String url, String title);
+	void addPageTitle(String url, String title) throws RemoteException;
 
-	void addPageContents(String url, String text);
+	void addPageContents(String url, String text) throws RemoteException;
 
-	void addPageLinks(String url, ArrayList<String> links);
+	void addPageLinks(String url, ArrayList<String> links) throws RemoteException;
 
-	ArrayList<String> getQueue();
+	ArrayList<String> getQueue() throws RemoteException;
 
-	void newQueue(ArrayList<String> newQueue);
+	void newQueue(ArrayList<String> newQueue) throws RemoteException;
 
-	void addIndexedUrl(String url);
+	void addIndexedUrl(String url) throws RemoteException;
 
-	void addToQueue(String url);
+	void addToQueue(String url) throws RemoteException;
 
-	void urlConnections(String url);
+	void urlConnections(String url) throws RemoteException;
 
-	HashSet<String> searchTerm(String term);
+	HashSet<String> searchTerm(String term) throws RemoteException;
 
-	HashSet<String> searchTerms(String terms);
+	HashSet<String> searchTerms(String terms) throws RemoteException;
 
-	HashSet<String> sortImp(HashSet<String> results);
+	HashSet<String> sortImp(HashSet<String> results) throws RemoteException;
 
-	String getPageTitle(String url);
+	String getPageTitle(String url) throws RemoteException;
 
-	ArrayList<String> getPagesWithLinkTo(String url);
+	ArrayList<String> getPagesWithLinkTo(String url) throws RemoteException;
 
-	String getShortQuote(String url);
+	String getShortQuote(String url) throws RemoteException;
 
-	String ping();
+	String ping() throws RemoteException;
 }
 

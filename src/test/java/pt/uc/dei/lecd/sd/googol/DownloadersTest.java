@@ -23,8 +23,8 @@ public class DownloadersTest {
     }
 
     @Test
-    void Should_receive_pong_When_Ping_Is_Called() throws RemoteException {
-        victim.indexURL("https://en.wikipedia.org/wiki/Stranger_Things");
+    void Should_return_true_When_indexURL() throws RemoteException {
+        Assertions.assertTrue(victim.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
     }
 
 }

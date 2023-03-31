@@ -35,16 +35,16 @@ public class GoogolCluster {
         log.info("Queue {} bound at {}", "queue", "googol/queue");
     }
     public static void main(String[] args) {
-        System.out.println("Googol cluster.... initialising.");
+        System.out.println("Googol Cluster .... inicializando.");
         GoogolCluster cluster = new GoogolCluster();
         try {
             cluster.init(1099);
         } catch (RemoteException | MalformedURLException | NotBoundException e) {
-            log.error("Failure initiating Googol Cluster.", e);
+            log.error("Falha ao iniciar o Googol Cluster.", e);
         }
-        System.out.println("Googol cluster initialized successfully.");
+        System.out.println("Googol Cluster inicializado com sucesso.");
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Press any key to stop cluster...");
+        System.out.print("Pressione qualquer tecla para parar o cluster...");
         scanner.nextLine();
         scanner.close();
     }

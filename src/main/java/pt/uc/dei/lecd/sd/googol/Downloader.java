@@ -44,12 +44,12 @@ public class Downloader implements Remote, Runnable {
      * @throws RemoteException
      */
     public boolean connectToBarrel(String url) throws RemoteException {
-        log.info("Downloader {} connecting to {}", name, url);
+        log.info("Downloader {} conectando-se a {}", name, url);
         try {
             this.barrel = (InterfaceBarrel) Naming.lookup(url);
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            log.error("Failed while connecting {} to {}", name, url, e);
+            log.error("Falha ao conectar {} a {}", name, url, e);
             return false;
         }
     }
@@ -85,7 +85,7 @@ public class Downloader implements Remote, Runnable {
             barrel.addPageLinks(url, linkList); // adicionar os links encontrados na pagina ao indice
             return true;
         } catch (IOException e) {
-            log.error("Unable to index url {} to barrel", url, e);
+            log.error("Não foi possível indexar o URL {} ao barrel", url, e);
             return false;
         }
     }
@@ -94,17 +94,17 @@ public class Downloader implements Remote, Runnable {
         if (queue != null) {
             queue.enqueue(link); 
         } else {
-            log.warn("Downloader {} not connected to queue, link {} will be ignored.", name, link);
+            log.warn("Downloader {} não conectado à queue, link {} será ignorado.", name, link);
         }
     }
 
     public boolean connectToQueue(String url) {
-        log.info("Downloader {} connecting to {}", name, url);
+        log.info("Downloader {} conectando-se a {}", name, url);
         try {
             this.queue = (Queue) Naming.lookup(url);
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            log.error("Failed while connecting {} to {}", name, url, e);
+            log.error("Falha ao conectar {} a {}", name, url, e);
             return false;
         }
     }
@@ -130,14 +130,14 @@ public class Downloader implements Remote, Runnable {
     @Override
     public void run() {
         this.running = true;
-        log.info("Starting run on downloader {}", this.name);
+        log.info("Iniciando execução do downloader {}", this.name);
         while (this.running) {
             try {
                 Thread.sleep(1000);
 
                 String url = (String) queue.dequeue();
                 if (url != null) {
-                    log.info("Downloader {} indexing url {}", this.name, url);
+                    log.info("Downloader {} indexing URL {}", this.name, url);
                     indexURL(url);
                 }
             } catch (RemoteException e) {

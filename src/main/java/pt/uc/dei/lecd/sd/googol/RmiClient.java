@@ -67,7 +67,7 @@ public class RmiClient {
 
 					// Display top 10 searches
 					List<String> top10 = getTop10Searches((RmiSearchModule) sm);
-					System.out.println("Top 10 searches:");
+					System.out.println("Top 10 pesquisas:");
 					for (String search : top10) {
 						System.out.println(search);
 					}

@@ -141,7 +141,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 				InterfaceBarrel barrel = (InterfaceBarrel) Naming.lookup("rmi://" + url + ":1099/IndexStorageBarrel");
 				barrels.add(barrel);
 			} catch (Exception e) {
-				System.err.println("Failed to connect to " + url + ": " + e.getMessage());
+				System.err.println("Falha ao conectar-se a " + url + ": " + e.getMessage());
 			}
 		}
 		return barrels;

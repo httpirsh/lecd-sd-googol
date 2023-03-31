@@ -47,6 +47,7 @@ public class Downloader implements Remote, Runnable {
         log.info("Downloader {} connecting to {}", name, url);
         try {
             this.barrel = (InterfaceBarrel) Naming.lookup(url);
+            this.barrel.callback(this.toString());
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             log.error("Failed while connecting {} to {}", name, url, e);

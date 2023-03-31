@@ -64,6 +64,7 @@ public class RmiClient {
 					for (String search : top10) {
 						System.out.println(search);
 					}
+					System.out.println("Os modulos conectados: " + this.search.getConnected());	
 					break;
 
 				case 4:

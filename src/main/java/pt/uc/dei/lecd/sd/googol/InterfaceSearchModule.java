@@ -15,4 +15,5 @@ public interface InterfaceSearchModule extends Remote {
 
 	public List<String> getTopSearches(int limit) throws RemoteException;
 
+    public String getConnected() throws RemoteException;
 }

@@ -33,6 +33,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     private final HashSet<String> indexedUrls; // conjunto de URLs já indexados
 
     private final Map<String, Integer> termCounts;
+    private final ArrayList<String> callbacks;
 
     /**
      * Construtor da classe que inicializa os atributos da classe
@@ -47,6 +48,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         this.urlsQueue = new ArrayList<>();
         this.indexedUrls = new HashSet<>();
         this.termCounts = new HashMap<>();
+        this.callbacks = new ArrayList<>();
     }
 
 
@@ -280,4 +282,14 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         scanner.nextLine();
         scanner.close();
 	}
+
+    @Override
+    public void callback(String downloader) {
+        this.callbacks.add(downloader);
+    }
+
+    @Override
+    public String getCallbacks() throws RemoteException {
+        return this.callbacks.toString();
+    }
 }

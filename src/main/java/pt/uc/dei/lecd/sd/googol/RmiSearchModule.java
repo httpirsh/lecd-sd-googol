@@ -32,6 +32,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	private InterfaceBarrel barrel;
 	private Queue queue;
 	private static final long serialVersionUID = 1L;
+	private final ArrayList<String> connected;
 
 	/**
 	 * O método main da classe tem a responsabilidade de iniciar o RMI Search Module, que permite
@@ -81,9 +82,11 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 
 	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
 		this.name = name;
+		this.connected = new ArrayList<>();
 	}
 	public void connectToBarrel(String url) throws MalformedURLException, NotBoundException, RemoteException {
 		this.barrel = (InterfaceBarrel) Naming.lookup(url);
+		this.connected.add(this.barrel.toString());
 	}
 
 	/**
@@ -215,10 +218,18 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		log.info("SearchModule {} connecting to {}", name, url);
         try {
             this.queue = (Queue) Naming.lookup(url);
+			this.connected.add(queue.toString());
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             log.error("Failed while connecting {} to {}", name, url, e);
             return false;
         }
+	}
+
+	@Override
+	public String getConnected() throws RemoteException {
+		String callbacks = this.barrel.getCallbacks();
+		String connected = this.connected.toString();
+		return callbacks.concat(connected);
 	}
 }

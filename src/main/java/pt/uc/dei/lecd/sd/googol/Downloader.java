@@ -16,17 +16,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
- * A classe Downloader é responsável por realizar o download de uma página web,
- * a analisa (usando o jsoup),
- * indexa o seu conteúdo e faz o uso de uma fila de URLs, para escalonar as
- * futuras visistas a páginas.
+ * A classe Downloader é responsável por realizar o download de uma página web, a analisa (usando o jsoup),
+ * indexa o seu conteúdo e faz o uso de uma fila de URLs, para escalonar as futuras visistas a páginas.
  * <p>
- * Essas informações são então armazenadas pelos pelos objetos da classe
- * IndexStorageBarrel, que recebem os
+ * Essas informações são então armazenadas pelos pelos objetos da classe IndexStorageBarrel, que recebem os
  * dados de vários Downloaders por meio de Java RMI.
  * <p>
- * Cada URL é indexado apenas por um Downloader que irá passar os resultados
- * para os Storage Barrels.
+ * Cada URL é indexado apenas por um Downloader que irá passar os resultados para os Storage Barrels.
  */
 @Slf4j
 public class Downloader implements Remote, Runnable {
@@ -57,6 +53,7 @@ public class Downloader implements Remote, Runnable {
             return false;
         }
     }
+
 
     public boolean indexURL(String url) throws RemoteException {
         // download da pagina Web

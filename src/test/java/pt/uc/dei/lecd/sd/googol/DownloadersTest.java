@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class DownloadersTest {
@@ -16,7 +15,7 @@ public class DownloadersTest {
 
     @BeforeAll
     static void init() throws RemoteException, MalformedURLException, NotBoundException {
-        Registry registry = LocateRegistry.createRegistry(1090);
+        Registry registry = TestUtils.getRegistryInstance(1090);
         registry.rebind("googoltest/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
         downloader = new Downloader("downloader_1");
         downloader.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");

@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
@@ -15,40 +14,6 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	List<String> searchLogs = new ArrayList<>();
 	private InterfaceBarrel barrel;
 	private static final long serialVersionUID = 1L;
-	private static InterfaceBarrel ba;
-
-	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-
-		int tentativas = 0;
-		while (tentativas < 5) {
-			try {
-				InterfaceBarrel b1 = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
-
-				RmiSearchModule sm = new RmiSearchModule("search-1");
-				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
-
-				RmiSearchModule.ba = ba;
-
-				System.out.println("RMI Search Module ativo ...");
-
-			} catch (RemoteException | MalformedURLException | NotBoundException re) {
-				System.out.println("Erro ao iniciar o RMI Search Module: " + re.getMessage());
-				System.out.println("Tentando se reconectar em 5 segundos...");
-
-				try {
-					Thread.sleep(5000);
-
-				} catch (InterruptedException ie) {
-					Thread.currentThread().interrupt(); // interrompe a thread atual
-				}
-				tentativas++;
-			}
-		}
-		if (tentativas == 5)
-			System.out.println("Não foi possível ativar o RMI Search Module.");
-
-	}
-
 
 	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
 		this.name = name;
@@ -59,7 +24,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	}
 
 	public List<String> searchResults(String terms) throws RemoteException {
-		HashSet<String> urls = ba.searchTerms(terms);
+		HashSet<String> urls = barrel.searchTerms(terms);
 		List<String> results = new ArrayList<>();
 
 		if (urls == null) {
@@ -70,9 +35,9 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 				if (i % 10 == 0) {
 					results.add("\n-------- Página " + (i / 10 + 1) + " --------\n");
 				}
-				results.add(ba.getPageTitle(url));
+				results.add(barrel.getPageTitle(url));
 				results.add(url);
-				results.add(ba.getShortQuote(url));
+				results.add(barrel.getShortQuote(url));
 				i++;
 			}
 		}

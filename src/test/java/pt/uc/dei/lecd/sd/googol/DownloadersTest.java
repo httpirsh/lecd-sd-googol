@@ -18,7 +18,7 @@ public class DownloadersTest {
         Registry registry = TestUtils.getRegistryInstance(1090);
         registry.rebind("googoltest/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
         downloader = new Downloader("downloader_1");
-        downloader.connect("//localhost:1090/googoltest/barrels/barrel_1");
+        downloader.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
     }
 
     @Test

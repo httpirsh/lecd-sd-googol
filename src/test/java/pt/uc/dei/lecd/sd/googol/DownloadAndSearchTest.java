@@ -29,7 +29,7 @@ public class DownloadAndSearchTest {
         registry.bind("googoltest/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
 
         downloader = new Downloader("downloader_1");
-        downloader.connect("//localhost:1090/googoltest/barrels/barrel_1");
+        downloader.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
 
         searchModule = new RmiSearchModule("search");
         searchModule.connect("//localhost:1090/googoltest/barrels/barrel_1");
@@ -47,23 +47,17 @@ public class DownloadAndSearchTest {
     }
 
     @Test
-    void Should_index_When_url_is_queued() throws RemoteException, AlreadyBoundException {
+    void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException {
         RMIQueue queue = new RMIQueue("testQueue");
         registry.bind("googoltest/queue", queue);
-        
+        downloader.connectToQueue("//localhost:1090/googoltest/queue");
+
         queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
-        queue.enqueue("https://en.wikipedia.org/wiki/Star_Trek");
-        queue.enqueue("https://en.wikipedia.org/wiki/The_Vampire_Diaries");
 
-        downloader.connectQueue("//localhost:1090/googoltest/queue");
         downloader.start();
-
-        // The downloader shall dequeue the url and the queue will become empty.
-        assertTimeoutPreemptively(Duration.ofSeconds(10), () -> {
-            while (!queue.isEmpty()) {
-                Thread.sleep(1000); // Wait for 1 second before trying again
-            }
-        });
+        Thread.sleep(2000);
         downloader.stop();
+
+        assertTrue(queue.size() > 1);
     }
 }

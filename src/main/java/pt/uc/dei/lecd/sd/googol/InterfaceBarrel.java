@@ -35,8 +35,6 @@ public interface InterfaceBarrel extends Remote {
 
 	void addIndexedUrl(String url) throws RemoteException;
 
-	void addToQueue(String url) throws RemoteException;
-
 	void urlConnections(String url) throws RemoteException;
 
 	HashSet<String> searchTerm(String term) throws RemoteException;

@@ -45,35 +45,10 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		return results;
 	}
 
-	// Indexar um novo url
-	public void indexNewURL(String url) throws RemoteException {
-		ba.addToQueue(url);
-		System.out.println("O novo URL foi indexado");
-	}
-
 	@Override
 	public String ping() {
 		return "pong";
 	}
-//
-//	// getBarrels
-//	// não pode ter nenhuma entrada como input
-//	public List<InterfaceBarrel> getBarrels() throws RemoteException {
-//		List<InterfaceBarrel> barrels = new ArrayList<>();
-//		for (InterfaceBarrel barrel : barrels) {
-//			try {
-//				InterfaceBarrel barrel = (InterfaceBarrel) Naming.lookup("rmi://" + url + ":1099/IndexStorageBarrel");
-//				barrels.add(barrel);
-//			} catch (Exception e) {
-//				System.err.println("Failed to connect to " + url + ": " + e.getMessage());
-//			}
-//		}
-//		return barrels;
-//	}
-
-
-
-
 
 	// counting searches
 	private Map<String, Integer> getTermCounts() throws RemoteException {
@@ -107,35 +82,9 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		return topTerms;
 	}
 
-//	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-//
-//		int tentativas = 0;
-//		while (tentativas < 5) {
-//			try {
-//				InterfaceBarrel b1 = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
-//
-//				RmiSearchModule sm = new RmiSearchModule("search-1");
-//				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
-//
-//				RmiSearchModule.ba = ba;
-//
-//				System.out.println("RMI Search Module ativo ...");
-//
-//			} catch (RemoteException | MalformedURLException | NotBoundException re) {
-//				System.out.println("Erro ao iniciar o RMI Search Module: " + re.getMessage());
-//				System.out.println("Tentando se reconectar em 5 segundos...");
-//
-//				try {
-//					Thread.sleep(5000);
-//
-//				} catch (InterruptedException ie) {
-//					Thread.currentThread().interrupt(); // interrompe a thread atual
-//				}
-//				tentativas++;
-//			}
-//		}
-//		if (tentativas == 5)
-//			System.out.println("Não foi possível ativar o RMI Search Module.");
-//
-//	}
+	@Override
+	public void indexNewURL(String url) throws RemoteException {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'indexNewURL'");
+	}
 }

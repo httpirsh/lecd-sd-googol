@@ -81,13 +81,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     	this.indexedUrls.add(url);
     }
     
-    // adicionar um url à fila, que ainda não tenha sido indexado
-    public void addToQueue(String url) {
-    	if(!indexedUrls.contains(url))
-    		this.urlsQueue.add(url);
-    		
-    }
-    
     // Atualizar o número de ligações da página linkada
     public void urlConnections(String url) {
     	Integer num = pageLinkCounts.getOrDefault(url, 0);

@@ -19,7 +19,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		this.name = name;
 	}
 
-	public void connect(String url) throws MalformedURLException, NotBoundException, RemoteException {
+	public void connectToBarrel(String url) throws MalformedURLException, NotBoundException, RemoteException {
 		this.barrel = (InterfaceBarrel) Naming.lookup(url);
 	}
 

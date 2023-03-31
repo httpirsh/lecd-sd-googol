@@ -32,7 +32,7 @@ public class DownloadAndSearchTest {
         downloader.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
 
         searchModule = new RmiSearchModule("search");
-        searchModule.connect("//localhost:1090/googoltest/barrels/barrel_1");
+        searchModule.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
     }
 
     @Test

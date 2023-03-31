@@ -30,6 +30,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	private final String name;
 	List<String> searchLogs = new ArrayList<>();
 	private InterfaceBarrel barrel;
+	private Queue queue;
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -134,8 +135,13 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * RemoteException.
 	 */
 	public void indexNewURL(String url) throws RemoteException {
-		this.barrel.addIndexedUrl(url);
-		log.info("index url {}", url);
+		if (this.queue != null) {
+			this.queue.enqueue(url);
+			log.info("index url {}", url);	
+		} else {
+			log.warn("Not connected to queue. Index request for {} was ignored.", url);
+		}
+		
 	}
 
 	@Override
@@ -203,5 +209,16 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 				System.out.println(barrel.getPagesWithLinkTo(url));
 			}
 		}
+	}
+
+	public boolean connectToQueue(String url) {
+		log.info("SearchModule {} connecting to {}", name, url);
+        try {
+            this.queue = (Queue) Naming.lookup(url);
+            return true;
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            log.error("Failed while connecting {} to {}", name, url, e);
+            return false;
+        }
 	}
 }

@@ -53,23 +53,38 @@ public class GoogolCluster {
         Registry registry = LocateRegistry.createRegistry(port);
         log.info("Registry ok");
 
-        registry.rebind("googol/search", new RmiSearchModule("search"));
-        log.info("RmiSearchModel {} bound at {}", "search", "googol/search");
+        IndexStorageBarrel barrel1 = new IndexStorageBarrel("barrel_1");
+        IndexStorageBarrel barrel2 = new IndexStorageBarrel("barrel_2");
 
-        registry.rebind("googol/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
+        RmiSearchModule search = new RmiSearchModule("search");
+
+        Downloader downloader1 = new Downloader("downloader_1");
+        Downloader downloader2 = new Downloader("downloader_2");
+        RMIQueue queue = new RMIQueue("queue");
+
+        registry.rebind("googol/search", search);
+        log.info("RmiSearchModule {} bound at {}", "search", "googol/search");
+
+        registry.rebind("googol/barrels/barrel_1", barrel1);
         log.info("IndexStorageBarrel {} bound at {}", "barrel_1", "googol/barrels/barrel_1");
 
-        registry.rebind("googol/barrels/barrel_2", new IndexStorageBarrel("barrel_2"));
+        registry.rebind("googol/barrels/barrel_2", barrel2);
         log.info("IndexStorageBarrel {} bound at {}", "barrel_2", "googol/barrels/barrel_2");
 
-        registry.rebind("googol/downloaders/downloader_1", new Downloader("downloader_1"));
+        registry.rebind("googol/downloaders/downloader_1", downloader1);
         log.info("Downloader {} bound at {}", "downloader_1", "googol/downloaders/downloader_1");
 
-        registry.rebind("googol/downloaders/downloader_2", new Downloader("downloader_2"));
+        registry.rebind("googol/downloaders/downloader_2", downloader2);
         log.info("Downloader {} bound at {}", "downloader_2", "googol/downloaders/downloader_2");
 
-        registry.rebind("googol/queue", new RMIQueue("queue"));
+        registry.rebind("googol/queue", queue);
         log.info("Queue {} bound at {}", "queue", "googol/queue");
+
+        downloader1.connectToBarrel("rmi://localhost/googol/barrels/barrel_1");
+        downloader1.connectToQueue("rmi://localhost/googol/queue");
+        downloader1.start();
+        search.connectToBarrel("rmi://localhost/googol/barrels/barrel_1");
+        search.connectToQueue("rmi://localhost/googol/queue");
     }
     public static void main(String[] args) {
         System.out.println("Googol cluster.... initialising.");

@@ -6,7 +6,6 @@ import java.util.LinkedList;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 /**
  * Implementação da Queue remota via RMI.
  * Os métodos são "synchronized" para garantir que apenas uma thread possa acessar a lista de URLs

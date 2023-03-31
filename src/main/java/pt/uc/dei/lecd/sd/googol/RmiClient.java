@@ -17,7 +17,6 @@ public class RmiClient {
     		iniciar(sc, sm);
 	}
 
-
 	public RmiClient(String name) {
 		this.name = name;
 	}
@@ -59,14 +58,14 @@ public class RmiClient {
 					sm.searchResults(termos);
 					if (registoLogin) {
 						// TODO: Fix listpages
-						//sm.listPages(termos);
+						// sm.listPages(termos);
 					}
 					break;
 
 				case 3:
 					// Display top 10 searches
 					List<String> top10 = getTop10Searches((RmiSearchModule) sm);
-					System.out.println("Top 10 searches:");
+					System.out.println("As 10 pesquisas mais comuns.");
 					for (String search : top10) {
 						System.out.println(search);
 					}

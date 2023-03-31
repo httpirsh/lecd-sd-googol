@@ -1,12 +1,20 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
-
 import java.net.MalformedURLException;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.util.Scanner;
 
+/**
+ * O código apresentado implementa a classe GoogolCluster que é responsável por iniciar e configurar um cluster para a aplicação Googol.
+ *
+ * O método init recebe uma porta como parâmetro e inicializa um registro de serviços RMI nessa porta.
+ * Em seguida, registra vários objetos RMI no registro, incluindo:
+ * o módulo de busca RmiSearchModule, dois objetos IndexStorageBarrel (usados para armazenar índices de páginas), dois objetos Downloader (usados para baixar páginas) e um objeto RMIQueue (usado para gerenciar as tarefas de busca).
+ * O método main inicializa um novo objeto GoogolCluster e chama o método init passando a porta 1099.
+ * Em seguida, o código espera a entrada do usuário para encerrar o cluster.
+*/
 
 @Slf4j
 public class GoogolCluster {

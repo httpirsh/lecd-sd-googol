@@ -72,9 +72,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		}
 		if (tentativas == 5)
 			System.out.println("Não foi possível ativar o RMI Search Module.");
-
 	}
-
 
 	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
 		this.name = name;
@@ -82,6 +80,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	public void connectToBarrel(String url) throws MalformedURLException, NotBoundException, RemoteException {
 		this.barrel = (InterfaceBarrel) Naming.lookup(url);
 	}
+
 	/**
 	 * O método searchResults tem como objetivo obter os resultados de uma pesquisa a partir dos
 	 * termos passados como argumento. Para isso, ele invoca o método "searchTerms" da instância
@@ -94,6 +93,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * conteúdo da página. Cada página de resultados é exibida em grupos de 10, utilizando um
 	 * separador que indica o início de uma nova página de resultados.
 	 */
+
 	public List<String> searchResults(String terms) throws RemoteException {
 		HashSet<String> urls = barrel.searchTerms(terms);
 		List<String> results = new ArrayList<>();
@@ -139,7 +139,11 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		return "pong";
 	}
 
-	// contar as pesquisas
+	/**
+	 * O método getTermCounts() itera sobre cada log de busca registrado,
+	 * separa as palavras de cada busca em termos, conta a frequência de cada termo e armazena essas contagens em um mapa.
+	 * O mapa resultante tem como chave o termo de busca e como valor a frequência do termo.
+	 */
 	private Map<String, Integer> getTermCounts() throws RemoteException {
 		Map<String, Integer> termCounts = new HashMap<>();
 
@@ -150,11 +154,14 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 				termCounts.put(term, termCounts.getOrDefault(term, 0) + 1);
 			}
 		}
-
 		return termCounts;
 	}
 
-	// top 10 searches
+	/**
+	 * O método getTopSearches(int limit) utiliza o método getTermCounts()
+	 * para obter a contagem de frequência de cada termo de busca e, em seguida, classifica esses termos por ordem decrescente de frequência.
+	 * Depois extrai os N termos mais frequentes (com base no limite especificado) e retorna-os numa lista de strings.
+	 */
 	public List<String> getTopSearches(int limit) throws RemoteException {
 		// Get all search terms and their frequency
 		Map<String, Integer> termCounts = getTermCounts();

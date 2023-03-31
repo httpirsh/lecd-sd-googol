@@ -9,13 +9,14 @@ import java.util.Scanner;
 
 public class RmiClient {
 	private final String name;
+	private InterfaceSearchModule search;
 
-    	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
+	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
     		Scanner sc = new Scanner(System.in);
     		InterfaceSearchModule sm = (InterfaceSearchModule) Naming.lookup("rmi://localhost/SearchModule");
     		iniciar(sc, sm);
-    	}
-	private InterfaceSearchModule search;
+	}
+
 
 	public RmiClient(String name) {
 		this.name = name;
@@ -55,14 +56,9 @@ public class RmiClient {
 					// Consultar os resultados da pesquisa
 					System.out.print("Digite os termos da pesquisa: ");
 					String termos = sc.nextLine();
-					List<String> results = sm.searchResults(termos);
+					sm.searchResults(termos);
 					if (registoLogin) {
-						//sm.listPages(termos);
-					}
-					// Imprime os resultados da pesquisa
-					System.out.println("Resultados da pesquisa: ");
-					for (String result : results) {
-						System.out.println(result);
+						sm.listPages(termos);
 					}
 					break;
 

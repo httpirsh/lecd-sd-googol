@@ -8,7 +8,20 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-
+/**
+ * A classe SearchModule é um componente essencial do sistema de busca e é responsável por atuar
+ * como porta de entrada para os clientes. Ela implementa os métodos que procuram responder às
+ * pesquisas realizadas pelos clientes.
+ * Para possibilitar essa comunicação, a classe implementa a interface InterfaceSearchModule.
+ * Isso permite que os objetos desta classe possam ser acessados remotamente por outros processos
+ * Java que usam RMI.
+ *
+ * Além disso, o Search Module comunica-se com os Storage Barrels (IndexStorageBarrel) por meio da
+ * interface InterfaceBarrel. Essa comunicação é realizada usando RMI, permitindo que o Search Module
+ * tenha acesso às informações que foram armazenadas no processo de armazenamento.
+ * Essa comunicação é essencial para que a classe seja capaz de buscar as informações necessárias e
+ * fornecer os resultados precisos aos clientes.
+ */
 public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSearchModule {
 
 	private final String name;
@@ -16,12 +29,26 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	private static final long serialVersionUID = 1L;
 	private static InterfaceBarrel ba;
 
+	/**
+	 * O método main da classe tem a responsabilidade de iniciar o RMI Search Module, que permite
+	 * satisfazer os pedidos dos clientes.
+	 *
+	 * Para isso, o método tenta localizar o objeto remoto IndexStorageBarrel (Storage Barrel) usando
+	 * o método Naming.lookup(). Se o objeto for encontrado, uma instância da classe SearchModule é
+	 * criada e registada no registo RMI com o nome "SearchModule" e no port 1099, permitindo assim
+	 * que os clientes possam se comunicar com o servidor.
+	 *
+	 * No entanto, se ocorrer uma exceção durante a tentativa de localização do objeto remoto ou de
+	 * registo no RMI, o programa exibe uma mensagem de erro e espera 5 segundos antes de tentar
+	 * novamente. Isso é feito até que o número máximo de tentativas definido seja atingido. Se todas
+	 * as tentativas falharem, uma mensagem de erro é exibida.
+	 */
 	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
 
 		int tentativas = 0;
 		while (tentativas < 5) {
 			try {
-				InterfaceBarrel b1 = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
+				InterfaceBarrel ba = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
 
 				RmiSearchModule sm = new RmiSearchModule("search-1");
 				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
@@ -53,29 +80,49 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		this.name = name;
 	}
 
-	public List<String> searchResults(String terms) throws RemoteException {
+	/**
+	 * O método searchResults tem como objetivo obter os resultados de uma pesquisa a partir dos
+	 * termos passados como argumento. Para isso, ele invoca o método "searchTerms" da instância
+	 * de "InterfaceBarrel" com o objetivo de obter um conjunto de URLs que correspondam aos termos
+	 * de pesquisa fornecidos. Caso a pesquisa não encontre nenhum resultado, o método exibe uma
+	 * mensagem indicando tal situação.
+	 *
+	 * Por outro lado, se a pesquisa retornar resultados, o método itera pelo conjunto de URLs
+	 * obtidos e, para cada URL, exibe o título da página, a própria URL e uma citação curta do
+	 * conteúdo da página. Cada página de resultados é exibida em grupos de 10, utilizando um
+	 * separador que indica o início de uma nova página de resultados.
+	 */
+	public void searchResults(String terms) throws RemoteException {
 		HashSet<String> urls = ba.searchTerms(terms);
-		List<String> results = new ArrayList<>();
-
 		if (urls == null) {
 			results.add("Não existem páginas que contenham esses termos");
 		} else {
 			int i = 0;
 			for (String url : urls) {
 				if (i % 10 == 0) {
-					results.add("\n-------- Página " + (i / 10 + 1) + " --------\n");
+					System.out.println("\n-------- Página " + (i / 10 + 1) + " --------\n");
 				}
-				results.add(ba.getPageTitle(url));
-				results.add(url);
-				results.add(ba.getShortQuote(url));
+				System.out.println(ba.getPageTitle(url));
+				System.out.println(url);
+				System.out.println(ba.getShortQuote(url));
 				i++;
 			}
 		}
-
-		return results;
 	}
 
-	// Indexar um novo url
+	/**
+	 * O método indexNewURL é responsável por adicionar um novo URL à fila de páginas a serem
+	 * indexadas. O método recebe um parâmetro de entrada "url", que representa o endereço da página
+	 * a ser adicionada à fila.
+	 *
+	 * Para adicionar o URL à fila, o método utiliza a referência à interface "InterfaceBarrel" para
+	 * invocar o método "addToQueue" no objeto remoto do servidor RMI. Esse método é responsável por
+	 * adicionar o URL recebido à fila de páginas a serem indexadas pelo servidor.
+	 *
+	 * Após adicionar o URL à fila com sucesso, o método exibe uma mensagem "O novo URL foi indexado".
+	 * Caso ocorra algum problema ao adicionar o URL à fila, o método lançará uma exceção do tipo
+	 * RemoteException.
+	 */
 	public void indexNewURL(String url) throws RemoteException {
 		ba.addToQueue(url);
 		System.out.println("O novo URL foi indexado");
@@ -133,4 +180,28 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		}
 		return topTerms;
 	}
+
+	/**
+	 * O método listPages imprime a lista de páginas que têm ligação para um determinado URL.
+	 *
+	 * Para tal, o método utiliza a referência à interface "InterfaceBarrel" para invocar o método
+	 * "getPagesWithLinkTo" que contêm a respetiva lista de páginas.
+	 *
+	 * Caso ocorra algum problema ao imprimir a lista de páginas, o método lançará uma exceção do
+	 * tipo RemoteException.
+	 */
+	public void listPages (String terms) throws RemoteException{
+		HashSet <String> urls = ba.searchTerms(terms);
+		if(urls == null)
+			System.out.println("Não existem páginas que contenham esses termos");
+
+		else {
+			for (String url: urls) {
+				System.out.println("Lista de páginas com ligação ao url " + url);
+				System.out.println(ba.getPagesWithLinkTo(url));
+			}
+		}
+	}
+
+
 }

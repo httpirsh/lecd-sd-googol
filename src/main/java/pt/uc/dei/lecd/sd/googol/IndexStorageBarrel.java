@@ -1,7 +1,6 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -264,21 +263,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     	
     	return shortQuote;
     }
-
-    // get downloaders
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     @Override
     public String ping() {

@@ -38,7 +38,7 @@ public class Downloader implements Remote, Runnable {
     }
 
     /**
-     * Connects to an Index Storage Barrel
+     * Conecta-se a uma Index Storage Barrel
      * @param url The url where the barrel is located
      * @return true is the connection was successfull, false otherwise
      * @throws RemoteException

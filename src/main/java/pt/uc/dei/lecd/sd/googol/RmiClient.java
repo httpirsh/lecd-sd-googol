@@ -26,11 +26,11 @@ public class RmiClient {
 		return search.ping();
 	}
     
-    	public static void menu () {
+    	public static void menu() {
     		// menu com as opções que utilizador pode realizar
     		System.out.println("1. Indexar um novo Url\n"
     				+ "2. Consultar lista de páginas com ligação para uma página específica\n"
-					+ "3. Página de Administração em Tempo Real\n"
+					+ "3. Página de administração atualizada em tempo real\n"
     				+ "4. Sair\n");
     		
     		System.out.println();
@@ -63,14 +63,13 @@ public class RmiClient {
 					break;
 
 				case 3:
-
-
 					// Display top 10 searches
 					List<String> top10 = getTop10Searches((RmiSearchModule) sm);
 					System.out.println("Top 10 searches:");
 					for (String search : top10) {
 						System.out.println(search);
 					}
+					break;
 
 				case 4:
 					System.out.println("Saíste do programa.");
@@ -139,7 +138,6 @@ public class RmiClient {
     	    }
     	}
 
-    	
     	// O metodo validaInteiro() testa cada token que é lida no canal de leitura, retornando um valor se for um inteiro.
         public static int validaInteiro(Scanner sc) {
             while (!sc.hasNextInt()) {    
@@ -154,12 +152,3 @@ public class RmiClient {
 		this.search = (InterfaceSearchModule) Naming.lookup(url);
 	}
 }
-
-
-
-
-
-
-
-
-

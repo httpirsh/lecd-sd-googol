@@ -26,60 +26,15 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 
 	private final String name;
 	List<String> searchLogs = new ArrayList<>();
+	private InterfaceBarrel barrel;
 	private static final long serialVersionUID = 1L;
-	private static InterfaceBarrel ba;
-
-	/**
-	 * O método main da classe tem a responsabilidade de iniciar o RMI Search Module, que permite
-	 * satisfazer os pedidos dos clientes.
-	 *
-	 * Para isso, o método tenta localizar o objeto remoto IndexStorageBarrel (Storage Barrel) usando
-	 * o método Naming.lookup(). Se o objeto for encontrado, uma instância da classe SearchModule é
-	 * criada e registada no registo RMI com o nome "SearchModule" e no port 1099, permitindo assim
-	 * que os clientes possam se comunicar com o servidor.
-	 *
-	 * No entanto, se ocorrer uma exceção durante a tentativa de localização do objeto remoto ou de
-	 * registo no RMI, o programa exibe uma mensagem de erro e espera 5 segundos antes de tentar
-	 * novamente. Isso é feito até que o número máximo de tentativas definido seja atingido. Se todas
-	 * as tentativas falharem, uma mensagem de erro é exibida.
-	 */
-	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-
-		int tentativas = 0;
-		while (tentativas < 5) {
-			try {
-				InterfaceBarrel ba = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
-
-				RmiSearchModule sm = new RmiSearchModule("search-1");
-				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
-
-				RmiSearchModule.ba = ba;
-
-				System.out.println("RMI Search Module ativo ...");
-
-			} catch (RemoteException | MalformedURLException | NotBoundException re) {
-				System.out.println("Erro ao iniciar o RMI Search Module: " + re.getMessage());
-				System.out.println("Tentando se reconectar em 5 segundos...");
-
-				try {
-					Thread.sleep(5000);
-
-				} catch (InterruptedException ie) {
-					Thread.currentThread().interrupt(); // interrompe a thread atual
-				}
-				tentativas++;
-			}
-		}
-		if (tentativas == 5)
-			System.out.println("Não foi possível ativar o RMI Search Module.");
-
-	}
-
 
 	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
 		this.name = name;
 	}
-
+	public void connectToBarrel(String url) throws MalformedURLException, NotBoundException, RemoteException {
+		this.barrel = (InterfaceBarrel) Naming.lookup(url);
+	}
 	/**
 	 * O método searchResults tem como objetivo obter os resultados de uma pesquisa a partir dos
 	 * termos passados como argumento. Para isso, ele invoca o método "searchTerms" da instância
@@ -93,7 +48,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * separador que indica o início de uma nova página de resultados.
 	 */
 	public void searchResults(String terms) throws RemoteException {
-		HashSet<String> urls = ba.searchTerms(terms);
+		HashSet<String> urls = barrel.searchTerms(terms);
 		if (urls == null) {
 			results.add("Não existem páginas que contenham esses termos");
 		} else {
@@ -102,12 +57,13 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 				if (i % 10 == 0) {
 					System.out.println("\n-------- Página " + (i / 10 + 1) + " --------\n");
 				}
-				System.out.println(ba.getPageTitle(url));
+				System.out.println(barrel.getPageTitle(url));
 				System.out.println(url);
-				System.out.println(ba.getShortQuote(url));
+				System.out.println(barrel.getShortQuote(url));
 				i++;
 			}
 		}
+		return results;
 	}
 
 	/**
@@ -124,7 +80,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * RemoteException.
 	 */
 	public void indexNewURL(String url) throws RemoteException {
-		ba.addToQueue(url);
+		barrel.addToQueue(url);
 		System.out.println("O novo URL foi indexado");
 	}
 
@@ -133,19 +89,6 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		return "pong";
 	}
 
-	// getBarrels
-	public List<InterfaceBarrel> getBarrels (String[] urls) throws RemoteException {
-		List<InterfaceBarrel> barrels = new ArrayList<>();
-		for (String url : urls) {
-			try {
-				InterfaceBarrel barrel = (InterfaceBarrel) Naming.lookup("rmi://" + url + ":1099/IndexStorageBarrel");
-				barrels.add(barrel);
-			} catch (Exception e) {
-				System.err.println("Failed to connect to " + url + ": " + e.getMessage());
-			}
-		}
-		return barrels;
-	}
 
 
 
@@ -192,17 +135,15 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * tipo RemoteException.
 	 */
 	public void listPages (String terms) throws RemoteException{
-		HashSet <String> urls = ba.searchTerms(terms);
+		HashSet <String> urls = barrel.searchTerms(terms);
 		if(urls == null)
 			System.out.println("Não existem páginas que contenham esses termos");
 
 		else {
 			for (String url: urls) {
 				System.out.println("Lista de páginas com ligação ao url " + url);
-				System.out.println(ba.getPagesWithLinkTo(url));
+				System.out.println(barrel.getPagesWithLinkTo(url));
 			}
 		}
 	}
-
-
 }

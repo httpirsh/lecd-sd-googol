@@ -59,7 +59,7 @@ public class Downloader implements Remote {
             return false;
         }
     }
-    
+
 
     public boolean indexURL(String url) throws RemoteException {
         // download da pagina Web
@@ -94,9 +94,6 @@ public class Downloader implements Remote {
             log.error("Unable to index url {} to barrel", url, e);
             return false;
         }
-
-        // indexar recursivamente:
-        indexURL(getNextURL(ba), ba);
     }
 
     /**
@@ -117,7 +114,7 @@ public class Downloader implements Remote {
         ba.newQueue(urlsQueue);
         // adicionar o url a lista de urls já visitados
         ba.addIndexedUrl(url);
-        System.out.println("Ola");
+
         return url;
 
     }

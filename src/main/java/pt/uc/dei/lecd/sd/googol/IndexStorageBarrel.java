@@ -3,7 +3,6 @@ package pt.uc.dei.lecd.sd.googol;
 import lombok.extern.slf4j.Slf4j;
 
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 

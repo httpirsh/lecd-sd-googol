@@ -87,10 +87,9 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	}
 
 	// getBarrels
-	// não pode ter nenhuma entrada como input
-	public List<InterfaceBarrel> getBarrels() throws RemoteException {
+	public List<InterfaceBarrel> getBarrels (String[] urls) throws RemoteException {
 		List<InterfaceBarrel> barrels = new ArrayList<>();
-		for (InterfaceBarrel barrel : barrels) {
+		for (String url : urls) {
 			try {
 				InterfaceBarrel barrel = (InterfaceBarrel) Naming.lookup("rmi://" + url + ":1099/IndexStorageBarrel");
 				barrels.add(barrel);
@@ -103,9 +102,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 
 
 
-
-
-	// counting searches
+	// contar as pesquisas
 	private Map<String, Integer> getTermCounts() throws RemoteException {
 		Map<String, Integer> termCounts = new HashMap<>();
 

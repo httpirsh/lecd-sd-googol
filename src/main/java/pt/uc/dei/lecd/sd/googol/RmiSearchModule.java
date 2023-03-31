@@ -8,6 +8,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * A classe SearchModule é um componente essencial do sistema de busca e é responsável por atuar
  * como porta de entrada para os clientes. Ela implementa os métodos que procuram responder às
@@ -22,6 +24,7 @@ import java.util.*;
  * Essa comunicação é essencial para que a classe seja capaz de buscar as informações necessárias e
  * fornecer os resultados precisos aos clientes.
  */
+@Slf4j
 public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSearchModule {
 
 	private final String name;
@@ -48,16 +51,17 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		int tentativas = 0;
 		while (tentativas < 5) {
 			try {
-				InterfaceBarrel ba = (InterfaceBarrel) Naming.lookup("rmi://localhost:1099/IndexStorageBarrel1");
-
 				RmiSearchModule sm = new RmiSearchModule("search-1");
-				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
-
-				//RmiSearchModule.ba = ba;
-
+				LocateRegistry.getRegistry().rebind("SearchModule", sm);
+				sm.connectToBarrel("rmi://localhost:1099/IndexStorageBarrel");
 				System.out.println("RMI Search Module ativo ...");
-
+				System.out.print("Press any key to stop IndexStorageBarrel...");
+				Scanner scanner = new Scanner(System.in);
+        		scanner.nextLine();
+        		scanner.close();
+				System.exit(0);
 			} catch (RemoteException | MalformedURLException | NotBoundException re) {
+				log.error("Erro ao iniciar o RMI Search Module:", re);
 				System.out.println("Erro ao iniciar o RMI Search Module: " + re.getMessage());
 				System.out.println("Tentando se reconectar em 5 segundos...");
 
@@ -130,9 +134,8 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * RemoteException.
 	 */
 	public void indexNewURL(String url) throws RemoteException {
-		// TODO: Não é no barrel, é na queue!!!!!
-		// barrel.addToQueue(url);
-		System.out.println("O novo URL foi indexado");
+		this.barrel.addIndexedUrl(url);
+		log.info("index url {}", url);
 	}
 
 	@Override

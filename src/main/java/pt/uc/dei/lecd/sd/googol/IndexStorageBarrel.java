@@ -2,6 +2,7 @@ package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
@@ -269,4 +270,14 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         log.info("ping was called, answering pong.");
         return "pong";
     }
+
+    public static void main(String [] args) throws RemoteException {
+		log.info("Starting IndexStorageBarrel...");
+		IndexStorageBarrel barrel = new IndexStorageBarrel("IndexStorageBarrel");
+        LocateRegistry.createRegistry(1099).rebind("IndexStorageBarrel", barrel);
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Press any key to stop IndexStorageBarrel...");
+        scanner.nextLine();
+        scanner.close();
+	}
 }

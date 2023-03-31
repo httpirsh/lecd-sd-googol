@@ -152,7 +152,7 @@ public class RmiClient {
 		log.info("Starting RMIClient...");
 		Scanner sc = new Scanner(System.in);
 		RmiClient client = new RmiClient("search");
-		client.connect("//localhost/googol/search");
+		client.connect("//localhost/SearchModule");
 		client.iniciar(sc);
 	}
 }

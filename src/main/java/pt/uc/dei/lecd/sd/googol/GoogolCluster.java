@@ -20,20 +20,19 @@ public class GoogolCluster {
         log.info("RmiSearchModel {} bound at {}", "search", "googol/search");
 
         registry.rebind("googol/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
-        log.info("IndexStorageBarrel {} bound at {}", "search", "googol/search");
+        log.info("IndexStorageBarrel {} bound at {}", "barrel_1", "googol/barrels/barrel_1");
 
         registry.rebind("googol/barrels/barrel_2", new IndexStorageBarrel("barrel_2"));
-        log.info("IndexStorageBarrel {} bound at {}", "search", "googol/search");
+        log.info("IndexStorageBarrel {} bound at {}", "barrel_2", "googol/barrels/barrel_2");
 
         registry.rebind("googol/downloaders/downloader_1", new Downloader("downloader_1"));
-        log.info("Downloader {} bound at {}", "search", "googol/search");
+        log.info("Downloader {} bound at {}", "downloader_1", "googol/downloaders/downloader_1");
 
         registry.rebind("googol/downloaders/downloader_2", new Downloader("downloader_2"));
-        log.info("Downloader {} bound at {}", "search", "googol/search");
+        log.info("Downloader {} bound at {}", "downloader_2", "googol/downloaders/downloader_2");
 
-        registry.rebind("googol/queue", new URLQueue("queue"));
-        log.info("URLQueue {} bound at {}", "search", "googol/search");
-
+        registry.rebind("googol/queue", new RMIQueue("queue"));
+        log.info("Queue {} bound at {}", "queue", "googol/queue");
     }
     public static void main(String[] args) {
         System.out.println("Googol cluster.... initialising.");
@@ -47,5 +46,6 @@ public class GoogolCluster {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Press any key to stop cluster...");
         scanner.nextLine();
+        scanner.close();
     }
 }

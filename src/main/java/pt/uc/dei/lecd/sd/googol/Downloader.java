@@ -9,7 +9,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,30 +25,25 @@ import org.jsoup.select.Elements;
  * Cada URL é indexado apenas por um Downloader que irá passar os resultados para os Storage Barrels.
  */
 @Slf4j
-public class Downloader implements Remote {
+public class Downloader implements Remote, Runnable {
 
     private final String name;
     private InterfaceBarrel barrel;
+    private Queue queue;
+    private boolean running;
 
     public Downloader(String name) {
         this.name = name;
+        this.running = false;
     }
 
     /**
-     * O método main realiza o download de uma página web, indexa seu conteúdo e adiciona links encontrados
-     * em uma fila de URLs, que são processados pelos Storage Barrels, utilizando Java RMI.
-     *
-     * Caso ocorra uma exceção ao atualizar o índice com o Storage Barrel, o programa tentará reconectar por
-     * até cinco vezes antes de encerrar a execução.
+     * Connects to an Index Storage Barrel
+     * @param url The url where the barrel is located
+     * @return true is the connection was successfull, false otherwise
+     * @throws RemoteException
      */
-
-    /**
-     * O método indexURL tem como objetivo fazer o download da página web a partir de uma determinada URL,
-     * extrair informações relevantes da página, atualizar os índices e continuar o processo de indexação
-     * recursivamente até que a fila de URLs a serem indexados esteja vazia.
-     */
-
-    public boolean connect(String url) throws RemoteException {
+    public boolean connectToBarrel(String url) throws RemoteException {
         log.info("Downloader {} connecting to {}", name, url);
         try {
             this.barrel = (InterfaceBarrel) Naming.lookup(url);
@@ -65,7 +59,7 @@ public class Downloader implements Remote {
         // download da pagina Web
         Document doc = null;
         try {
-            doc = Jsoup.connect(url.toString()).get();
+            doc = Jsoup.connect(url).get();
             String title = doc.title(); // titulo da pagina web
             String text = doc.text(); // texto da pagina web
             Elements links = doc.select("a[href]"); // buscar os links da pagina
@@ -82,7 +76,7 @@ public class Downloader implements Remote {
                 barrel.addToIndex(tokens.nextToken().toLowerCase(), url); // adicionar a palavra ao indice invertido
 
             for (String link : linkList) {
-                barrel.addToQueue(link); // Adicionar o link à fila
+                enqueue(link); // Adicionar link à queue para indexar recursivamente
                 barrel.urlConnections(link); // Atualizar o número de ligações da página linkada
             }
 
@@ -96,27 +90,62 @@ public class Downloader implements Remote {
         }
     }
 
-    /**
-     * O método getNextURL é responsável por obter o próximo URL a ser indexado.
-     * <p>
-     * Este método é "synchronized" para garantir que apenas uma thread possa acessar a lista de URLs
-     * e executar as operações defenidas, evitando possíveis conflituos de acesso e garantindo que a
-     * lista seja manipulada de maneira consistente e segura em ambientes onde múltiplas threads podem
-     * estar acessando-a simultaneamente.
-     */
-    public synchronized static String getNextURL(InterfaceBarrel ba) throws RemoteException {
-        ArrayList<String> urlsQueue = ba.getQueue();
-        String url = urlsQueue.iterator().next();
-
-        // remover o url já vistado da fila
-        urlsQueue.remove(url);
-        // atualizar a fila
-        ba.newQueue(urlsQueue);
-        // adicionar o url a lista de urls já visitados
-        ba.addIndexedUrl(url);
-
-        return url;
-
+    private void enqueue(String link) throws RemoteException {
+        if (queue != null) {
+            queue.enqueue(link); 
+        } else {
+            log.warn("Downloader {} not connected to queue, link {} will be ignored.", name, link);
+        }
     }
 
+    public boolean connectToQueue(String url) {
+        log.info("Downloader {} connecting to {}", name, url);
+        try {
+            this.queue = (Queue) Naming.lookup(url);
+            return true;
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            log.error("Failed while connecting {} to {}", name, url, e);
+            return false;
+        }
+    }
+
+    /**
+     * Stops the downloader thread.
+     */
+    public void stop() {
+        this.running = false;
+    }
+
+    /**
+     * Starts dequeuing urls from the queue and indexing them.
+     */
+    public void start() {
+        if (!running) {
+            Thread t = new Thread(this);
+            t.setName("thread_" + name);
+            t.start();
+        }
+    }
+
+    @Override
+    public void run() {
+        this.running = true;
+        log.info("Starting run on downloader {}", this.name);
+        while (this.running) {
+            try {
+                Thread.sleep(1000);
+
+                String url = (String) queue.dequeue();
+                if (url != null) {
+                    log.info("Downloader {} indexing url {}", this.name, url);
+                    indexURL(url);
+                }
+            } catch (RemoteException e) {
+                log.error("Error in downloader {} while trying to dequeue", this.name, e);
+            } catch (InterruptedException e) {
+                // carry on
+            } 
+        }
+        log.info("Downloader {} stopped.", this.name);
+    }
 }

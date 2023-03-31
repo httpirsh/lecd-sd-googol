@@ -6,6 +6,19 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
+
+/**
+ * A classe IndexStorageBarrel é responsável por armazenar informações sobre páginas web,
+ * permitindo que os usuários possam realizar as funcionalidades estabelecidas para este
+ * projeto.
+ *
+ * A classe utiliza a tecnologia RMI que permite a invocação de métodos remotos entre
+ * diferentes processos em uma rede. Para que isso seja possível, a classe implementa a
+ * interface InterfaceBarrel, para permitir que objetos do tipo IndexStorageBarrel sejam
+ * acessíveis remotamente. Isso significa que um utilizador pode chamar métodos em objetos
+ * IndexStorageBarrel em outra máquina, como se estivessem sendo chamados localmente.
+ */
+
 @Slf4j
 public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel{
 

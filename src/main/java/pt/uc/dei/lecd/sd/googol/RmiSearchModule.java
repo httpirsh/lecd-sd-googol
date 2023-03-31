@@ -26,8 +26,8 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 
 	private final String name;
 	List<String> searchLogs = new ArrayList<>();
+	private InterfaceBarrel barrel;
 	private static final long serialVersionUID = 1L;
-	private static InterfaceBarrel ba;
 
 	/**
 	 * O método main da classe tem a responsabilidade de iniciar o RMI Search Module, que permite
@@ -53,7 +53,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 				RmiSearchModule sm = new RmiSearchModule("search-1");
 				LocateRegistry.createRegistry(1099).rebind("SearchModule", sm);
 
-				RmiSearchModule.ba = ba;
+				//RmiSearchModule.ba = ba;
 
 				System.out.println("RMI Search Module ativo ...");
 
@@ -72,12 +72,13 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		}
 		if (tentativas == 5)
 			System.out.println("Não foi possível ativar o RMI Search Module.");
-
 	}
-
 
 	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
 		this.name = name;
+	}
+	public void connectToBarrel(String url) throws MalformedURLException, NotBoundException, RemoteException {
+		this.barrel = (InterfaceBarrel) Naming.lookup(url);
 	}
 
 	/**
@@ -92,22 +93,27 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * conteúdo da página. Cada página de resultados é exibida em grupos de 10, utilizando um
 	 * separador que indica o início de uma nova página de resultados.
 	 */
-	public void searchResults(String terms) throws RemoteException {
-		HashSet<String> urls = ba.searchTerms(terms);
+
+	public List<String> searchResults(String terms) throws RemoteException {
+		searchLogs.add(terms);
+		HashSet<String> urls = barrel.searchTerms(terms);
+		List<String> results = new ArrayList<>();
+
 		if (urls == null) {
 			results.add("Não existem páginas que contenham esses termos");
 		} else {
 			int i = 0;
 			for (String url : urls) {
 				if (i % 10 == 0) {
-					System.out.println("\n-------- Página " + (i / 10 + 1) + " --------\n");
+					results.add("\n-------- Página " + (i / 10 + 1) + " --------\n");
 				}
-				System.out.println(ba.getPageTitle(url));
-				System.out.println(url);
-				System.out.println(ba.getShortQuote(url));
+				results.add(barrel.getPageTitle(url));
+				results.add(url);
+				results.add(barrel.getShortQuote(url));
 				i++;
 			}
 		}
+		return results;
 	}
 
 	/**
@@ -124,7 +130,8 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * RemoteException.
 	 */
 	public void indexNewURL(String url) throws RemoteException {
-		ba.addToQueue(url);
+		// TODO: Não é no barrel, é na queue!!!!!
+		// barrel.addToQueue(url);
 		System.out.println("O novo URL foi indexado");
 	}
 
@@ -133,23 +140,11 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		return "pong";
 	}
 
-	// getBarrels
-	public List<InterfaceBarrel> getBarrels (String[] urls) throws RemoteException {
-		List<InterfaceBarrel> barrels = new ArrayList<>();
-		for (String url : urls) {
-			try {
-				InterfaceBarrel barrel = (InterfaceBarrel) Naming.lookup("rmi://" + url + ":1099/IndexStorageBarrel");
-				barrels.add(barrel);
-			} catch (Exception e) {
-				System.err.println("Failed to connect to " + url + ": " + e.getMessage());
-			}
-		}
-		return barrels;
-	}
-
-
-
-	// contar as pesquisas
+	/**
+	 * O método getTermCounts() itera sobre cada log de busca registrado,
+	 * separa as palavras de cada busca em termos, conta a frequência de cada termo e armazena essas contagens em um mapa.
+	 * O mapa resultante tem como chave o termo de busca e como valor a frequência do termo.
+	 */
 	private Map<String, Integer> getTermCounts() throws RemoteException {
 		Map<String, Integer> termCounts = new HashMap<>();
 
@@ -160,11 +155,14 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 				termCounts.put(term, termCounts.getOrDefault(term, 0) + 1);
 			}
 		}
-
 		return termCounts;
 	}
 
-	// top 10 searches
+	/**
+	 * O método getTopSearches(int limit) utiliza o método getTermCounts()
+	 * para obter a contagem de frequência de cada termo de busca e, em seguida, classifica esses termos por ordem decrescente de frequência.
+	 * Depois extrai os N termos mais frequentes (com base no limite especificado) e retorna-os numa lista de strings.
+	 */
 	public List<String> getTopSearches(int limit) throws RemoteException {
 		// Get all search terms and their frequency
 		Map<String, Integer> termCounts = getTermCounts();
@@ -191,18 +189,16 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * Caso ocorra algum problema ao imprimir a lista de páginas, o método lançará uma exceção do
 	 * tipo RemoteException.
 	 */
-	public void listPages (String terms) throws RemoteException{
-		HashSet <String> urls = ba.searchTerms(terms);
+	public void listPages (String terms) throws RemoteException {
+		HashSet <String> urls = barrel.searchTerms(terms);
 		if(urls == null)
 			System.out.println("Não existem páginas que contenham esses termos");
 
 		else {
 			for (String url: urls) {
 				System.out.println("Lista de páginas com ligação ao url " + url);
-				System.out.println(ba.getPagesWithLinkTo(url));
+				System.out.println(barrel.getPagesWithLinkTo(url));
 			}
 		}
 	}
-
-
 }

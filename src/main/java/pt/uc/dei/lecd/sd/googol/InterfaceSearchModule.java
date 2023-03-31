@@ -11,4 +11,6 @@ public interface InterfaceSearchModule extends Remote {
 	void indexNewURL(String url)  throws RemoteException;
 	
 	String ping() throws RemoteException;
+
+    //void listPages(String termos) throws RemoteException;
 }

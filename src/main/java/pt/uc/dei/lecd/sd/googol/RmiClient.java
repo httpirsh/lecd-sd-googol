@@ -58,7 +58,8 @@ public class RmiClient {
 					String termos = sc.nextLine();
 					sm.searchResults(termos);
 					if (registoLogin) {
-						sm.listPages(termos);
+						// TODO: Fix listpages
+						//sm.listPages(termos);
 					}
 					break;
 
@@ -144,7 +145,7 @@ public class RmiClient {
                 System.out.println("Deve inserir um numero inteiro: ");
                 sc.next();				  
             }
-            int num=sc.nextInt(); 
+            int num = sc.nextInt();
             return num;
         }
 

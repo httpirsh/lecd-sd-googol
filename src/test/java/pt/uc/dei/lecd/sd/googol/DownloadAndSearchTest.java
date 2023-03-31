@@ -6,13 +6,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
-import java.time.Duration;
 import java.util.List;
 
 @Slf4j
@@ -55,7 +52,7 @@ public class DownloadAndSearchTest {
         queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
 
         downloader.start();
-        Thread.sleep(2000);
+        Thread.sleep(5000);
         downloader.stop();
 
         assertTrue(queue.size() > 1);

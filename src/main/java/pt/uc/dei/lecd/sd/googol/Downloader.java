@@ -56,6 +56,8 @@ public class Downloader implements Remote, Runnable {
 
 
     public boolean indexURL(String url) throws RemoteException {
+        log.info("Downloader {} indexing url {}", this.name, url);
+
         // download da pagina Web
         Document doc = null;
         try {
@@ -63,6 +65,7 @@ public class Downloader implements Remote, Runnable {
             String title = doc.title(); // titulo da pagina web
             String text = doc.text(); // texto da pagina web
             Elements links = doc.select("a[href]"); // buscar os links da pagina
+            log.debug("Indexing page title:{}, links.size:{}", title, links.size());
             ArrayList<String> linkList = new ArrayList<>(); // criar um arraylist para colocar os links
 
             // adicionar links ao array
@@ -137,7 +140,6 @@ public class Downloader implements Remote, Runnable {
 
                 String url = (String) queue.dequeue();
                 if (url != null) {
-                    log.info("Downloader {} indexing url {}", this.name, url);
                     indexURL(url);
                 }
             } catch (RemoteException e) {

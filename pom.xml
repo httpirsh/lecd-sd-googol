@@ -72,6 +72,43 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                  <execution>
+                    <id>cluster</id>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>jar</goal>
+                    </goals>
+                    <configuration>
+                      <classifier>cluster</classifier> 
+                      <finalName>googol-cluster</finalName>
+                      <includes>
+                        <include>pt.uc.dei.lecd.sd.googol/**</include>
+                      </includes>
+                      <mainClass>pt.uc.dei.lecd.sd.googol.GoogolCluster</mainClass>
+                    </configuration>
+                  </execution>
+                  <execution>
+                    <id>client</id>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>jar</goal>
+                    </goals>
+                    <configuration>
+                      <classifier>client</classifier> 
+                      <finalName>googol-client</finalName>
+                      <includes>
+                        <include>pt.uc.dei.lecd.sd.googol/**</include>
+                      </includes>
+                      <mainClass>pt.uc.dei.lecd.sd.googol.GoogolClient</mainClass>
+                    </configuration>
+                  </execution>
+                </executions>
+              </plugin>
         </plugins>
     </build>
 

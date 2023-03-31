@@ -19,8 +19,6 @@ import java.util.List;
  */
 public interface InterfaceBarrel extends Remote {
 
-	List<String> getSearchHistory() throws RemoteException;
-
 	void addToIndex(String term, String url) throws RemoteException;
 
 	void addPageTitle(String url, String title) throws RemoteException;

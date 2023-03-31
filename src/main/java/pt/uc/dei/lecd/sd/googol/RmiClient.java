@@ -8,10 +8,18 @@ import java.util.List;
 import java.util.Scanner;
 
 import lombok.extern.slf4j.Slf4j;
+
+/**
+ * Esta classe implementa um cliente para um módulo de busca remoto.
+ * O código usa a biblioteca Lombok para reduzir a verbosidade do código.
+ *
+ * O programa consiste num menu de opções que permite ao usuário interagir com o módulo de busca remoto.
+ */
 @Slf4j
 public class RmiClient {
 	private final String name;
 	private InterfaceSearchModule search;
+
 
 	public RmiClient(String name) {
 		this.name = name;
@@ -20,8 +28,16 @@ public class RmiClient {
 	public String callPing() throws RemoteException {
 		return search.ping();
 	}
-    
-    	public static void menu() {
+
+	/**
+	 * As opções disponíveis são:
+	 *
+	 * Indexar um novo URL: permite que o usuário insira manualmente um URL para ser indexado pelo módulo de busca remoto.
+	 * Consultar lista de páginas com ligação para uma página específica: permite que o usuário digite os termos de pesquisa e recebe uma lista de páginas que contêm links para a página procurada.
+	 * Página de administração atualizada em tempo real: permite que o usuário visualize as 10 pesquisas mais comuns realizadas pelos usuários.
+	 * Sair: fecha o programa.
+	 */
+	public static void menu() {
     		// menu com as opções que utilizador pode realizar
     		System.out.println("1. Indexar um novo Url\n"
     				+ "2. Consultar lista de páginas com ligação para uma página específica\n"
@@ -58,6 +74,7 @@ public class RmiClient {
 					break;
 
 				case 3:
+					//List<String> barrels_downloaders_ativos =
 					// Mostrar top 10 de pesquisas
 					List<String> top10 = search.getTopSearches(10);
 					System.out.println("As 10 pesquisas mais comuns.");
@@ -76,10 +93,7 @@ public class RmiClient {
 			}
 		} while (opcao != 4);
 	}
-
-	public List<String> getTop10Searches(RmiSearchModule sm) throws RemoteException {
-		return sm.getTopSearches(10);
-	}
+	
     	
     	public static boolean registoLogin(Scanner sc) {
     	    boolean registo = false;

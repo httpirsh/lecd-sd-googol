@@ -140,11 +140,11 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	public void indexNewURL(String url) throws RemoteException {
 		if (this.queue != null) {
 			this.queue.enqueue(url);
-			log.info("index url {}", url);	
+			log.info("index url {}", url);
 		} else {
 			log.warn("Not connected to queue. Index request for {} was ignored.", url);
 		}
-		
+
 	}
 
 	@Override
@@ -189,29 +189,6 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 			topTerms.add(sortedTerms.get(i).getKey());
 		}
 		return topTerms;
-	}
-
-
-	/**
-	 * O método listPages imprime a lista de páginas que têm ligação para um determinado URL.
-	 *
-	 * Para tal, o método utiliza a referência à interface "InterfaceBarrel" para invocar o método
-	 * "getPagesWithLinkTo" que contêm a respetiva lista de páginas.
-	 *
-	 * Caso ocorra algum problema ao imprimir a lista de páginas, o método lançará uma exceção do
-	 * tipo RemoteException.
-	 */
-	public void listPages (String terms) throws RemoteException {
-		HashSet <String> urls = barrel.searchTerms(terms);
-		if(urls == null)
-			System.out.println("Não existem páginas que contenham esses termos");
-
-		else {
-			for (String url: urls) {
-				System.out.println("Lista de páginas com ligação ao url " + url);
-				System.out.println(barrel.getPagesWithLinkTo(url));
-			}
-		}
 	}
 
 	public boolean connectToQueue(String url) {

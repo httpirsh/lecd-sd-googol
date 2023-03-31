@@ -6,7 +6,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-
 /**
  * A classe IndexStorageBarrel é responsável por armazenar informações sobre páginas web,
  * permitindo que os usuários possam realizar as funcionalidades estabelecidas para este
@@ -49,12 +48,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         this.indexedUrls = new HashSet<>();
         this.termCounts = new HashMap<>();
         this.callbacks = new ArrayList<>();
-    }
-
-
-    @Override
-    public List<String> getSearchHistory() throws RemoteException {
-        return null;
     }
 
     /**

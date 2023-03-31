@@ -13,7 +13,7 @@ public interface InterfaceSearchModule extends Remote {
 	
 	String ping() throws RemoteException;
 
-	public List<String> getTopSearches(int limit) throws RemoteException;
+	List<String> getTopSearches(int limit) throws RemoteException;
 
     public String getConnected() throws RemoteException;
 }

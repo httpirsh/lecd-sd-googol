@@ -5,16 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
-import java.rmi.server.RemoteServer;
-import java.rmi.server.ServerNotActiveException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,6 +34,11 @@ public class SearchModuleTests {
         searchModule.connectToBarrel("//localhost:1090/SearchModuleTests/barrels/barrel_1");
     }
 
+    /**
+     * O método Should_return_top10_After_many_searches testa a funcionalidade de retornar as 10 pesquisas mais comuns.
+     * O teste faz 20 pesquisas e verifica se as 10 pesquisas mais comuns retornadas contêm apenas números pares.
+     * @throws RemoteException
+     */
     @Test
     void Should_return_top10_After_many_searches() throws RemoteException {
         // Fazer 20 pesquisas

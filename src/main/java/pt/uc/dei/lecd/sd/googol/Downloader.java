@@ -8,7 +8,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
-
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -55,7 +54,6 @@ public class Downloader implements Remote, Runnable {
         }
     }
 
-
     public boolean indexURL(String url) throws RemoteException {
         // download da pagina Web
         Document doc = null;
@@ -81,9 +79,9 @@ public class Downloader implements Remote, Runnable {
                 barrel.urlConnections(link); // Atualizar o número de ligações da página linkada
             }
 
-            barrel.addPageTitle(url, title); // adicionar o titulo da pagina ao indice
-            barrel.addPageContents(url, text); // adicionar o texto da pagina ao indice
-            barrel.addPageLinks(url, linkList); // adicionar os links encontrados na pagina ao indice
+            barrel.addPageTitle(url, title); // Adicionar o titulo da pagina ao indice
+            barrel.addPageContents(url, text); // Adicionar o texto da pagina ao indice
+            barrel.addPageLinks(url, linkList); // Adicionar os links encontrados na pagina ao indice
             return true;
         } catch (IOException e) {
             log.error("Unable to index url {} to barrel", url, e);

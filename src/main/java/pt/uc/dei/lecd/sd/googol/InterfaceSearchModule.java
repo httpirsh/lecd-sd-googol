@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+
 public interface InterfaceSearchModule extends Remote {
 	
 	List<String> searchResults(String terms) throws RemoteException;
@@ -11,4 +12,8 @@ public interface InterfaceSearchModule extends Remote {
 	void indexNewURL(String url)  throws RemoteException;
 	
 	String ping() throws RemoteException;
+
+	//void listPages(String termos);
+
+	//void listPages(String termos) throws RemoteException;
 }

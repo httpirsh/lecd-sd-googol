@@ -18,10 +18,10 @@ import org.jsoup.select.Elements;
 /**
  * A classe Downloader é responsável por realizar o download de uma página web, a analisa (usando o jsoup),
  * indexa o seu conteúdo e faz o uso de uma fila de URLs, para escalonar as futuras visistas a páginas.
- *
+ * <p>
  * Essas informações são então armazenadas pelos pelos objetos da classe IndexStorageBarrel, que recebem os
  * dados de vários Downloaders por meio de Java RMI.
- *
+ * <p>
  * Cada URL é indexado apenas por um Downloader que irá passar os resultados para os Storage Barrels.
  */
 @Slf4j
@@ -44,12 +44,12 @@ public class Downloader implements Remote, Runnable {
      * @throws RemoteException
      */
     public boolean connectToBarrel(String url) throws RemoteException {
-        log.info("Downloader {} conectando-se a {}", name, url);
+        log.info("Downloader {} connecting to {}", name, url);
         try {
             this.barrel = (InterfaceBarrel) Naming.lookup(url);
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            log.error("Falha ao conectar {} a {}", name, url, e);
+            log.error("Failed while connecting {} to {}", name, url, e);
             return false;
         }
     }
@@ -85,7 +85,7 @@ public class Downloader implements Remote, Runnable {
             barrel.addPageLinks(url, linkList); // adicionar os links encontrados na pagina ao indice
             return true;
         } catch (IOException e) {
-            log.error("Não foi possível indexar o URL {} ao barrel", url, e);
+            log.error("Unable to index url {} to barrel", url, e);
             return false;
         }
     }
@@ -94,17 +94,17 @@ public class Downloader implements Remote, Runnable {
         if (queue != null) {
             queue.enqueue(link); 
         } else {
-            log.warn("Downloader {} não conectado à queue, link {} será ignorado.", name, link);
+            log.warn("Downloader {} not connected to queue, link {} will be ignored.", name, link);
         }
     }
 
     public boolean connectToQueue(String url) {
-        log.info("Downloader {} conectando-se a {}", name, url);
+        log.info("Downloader {} connecting to {}", name, url);
         try {
             this.queue = (Queue) Naming.lookup(url);
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            log.error("Falha ao conectar {} a {}", name, url, e);
+            log.error("Failed while connecting {} to {}", name, url, e);
             return false;
         }
     }
@@ -130,14 +130,14 @@ public class Downloader implements Remote, Runnable {
     @Override
     public void run() {
         this.running = true;
-        log.info("Iniciando execução do downloader {}", this.name);
+        log.info("Starting run on downloader {}", this.name);
         while (this.running) {
             try {
                 Thread.sleep(1000);
 
                 String url = (String) queue.dequeue();
                 if (url != null) {
-                    log.info("Downloader {} indexing URL {}", this.name, url);
+                    log.info("Downloader {} indexing url {}", this.name, url);
                     indexURL(url);
                 }
             } catch (RemoteException e) {

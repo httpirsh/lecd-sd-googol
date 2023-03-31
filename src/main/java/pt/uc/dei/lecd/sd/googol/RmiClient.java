@@ -7,15 +7,11 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class RmiClient {
 	private final String name;
 	private InterfaceSearchModule search;
-
-	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
-    		Scanner sc = new Scanner(System.in);
-    		InterfaceSearchModule sm = (InterfaceSearchModule) Naming.lookup("rmi://localhost/SearchModule");
-    		iniciar(sc, sm);
-	}
 
 	public RmiClient(String name) {
 		this.name = name;
@@ -36,7 +32,7 @@ public class RmiClient {
             System.out.println("Digite a opção que deseja:");
     	}
 
-	public static void iniciar(Scanner sc, InterfaceSearchModule sm) throws RemoteException, NotBoundException, MalformedURLException {
+	public void iniciar(Scanner sc) throws RemoteException, NotBoundException, MalformedURLException {
 		int opcao;
 		boolean registoLogin = registoLogin(sc);
 		do {
@@ -48,14 +44,14 @@ public class RmiClient {
 					// Indexar um novo url
 					System.out.println("Introduza manualmente um URL para ser indexado: ");
 					String url = sc.nextLine();
-					sm.indexNewURL(url);
+					this.search.indexNewURL(url);
 					break;
 
 				case 2:
 					// Consultar os resultados da pesquisa
 					System.out.print("Digite os termos da pesquisa: ");
 					String termos = sc.nextLine();
-					List<String> pages = sm.searchResults(termos);
+					List<String> pages = this.search.searchResults(termos);
 					for (String page : pages) {
 						System.out.println(page);
 					}
@@ -63,7 +59,7 @@ public class RmiClient {
 
 				case 3:
 					// Mostrar top 10 de pesquisas
-					List<String> top10 = getTop10Searches((RmiSearchModule) sm);
+					List<String> top10 = search.getTopSearches(10);
 					System.out.println("As 10 pesquisas mais comuns.");
 					for (String search : top10) {
 						System.out.println(search);
@@ -80,7 +76,7 @@ public class RmiClient {
 		} while (opcao != 4);
 	}
 
-	public static List<String> getTop10Searches(RmiSearchModule sm) throws RemoteException {
+	public List<String> getTop10Searches(RmiSearchModule sm) throws RemoteException {
 		return sm.getTopSearches(10);
 	}
     	
@@ -148,6 +144,15 @@ public class RmiClient {
         }
 
 	public void connect(String url) throws MalformedURLException, NotBoundException, RemoteException {
+		log.info("{} connecting with search module {}", name, url);
 		this.search = (InterfaceSearchModule) Naming.lookup(url);
+	}
+
+	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
+		log.info("Starting RMIClient...");
+		Scanner sc = new Scanner(System.in);
+		RmiClient client = new RmiClient("search");
+		client.connect("//localhost/googol/search");
+		client.iniciar(sc);
 	}
 }

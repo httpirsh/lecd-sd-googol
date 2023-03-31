@@ -79,29 +79,4 @@ public class SearchModuleTests {
 
         );
     }
-
-    @Test
-    void Should_get_admin_stats() throws AccessException, RemoteException, NotBoundException, ServerNotActiveException, MalformedURLException {
-        // top ten searches
-        // lista de downloaders (IP:porto)
-        // lista de barrels (IP:porto)
-         // Get the list of all registered object names
-         String[] objectNames = registry.list();
-        
-         // Iterate over the list of object names and retrieve each object
-         for (String objectName : objectNames) {
-             // Get the remote object reference
-             Remote remoteObject = (Remote) Naming.lookup(objectName);
-             
-             // Cast the remote object to RemoteServer to get IP address and port
-             RemoteServer remoteServer = (RemoteServer) remoteObject;
-             String ipAddress = RemoteServer.getClientHost();
-             int port = remoteServer.getRef().remoteToString().indexOf(":");
-             
-             // Print the IP address and port to the console
-             log.debug("Object " + objectName + " is located at " + ipAddress + ":" + port);
-         }
-    }
-
-  
 }

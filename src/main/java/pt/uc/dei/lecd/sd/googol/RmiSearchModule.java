@@ -95,6 +95,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 */
 
 	public List<String> searchResults(String terms) throws RemoteException {
+		searchLogs.add(terms);
 		HashSet<String> urls = barrel.searchTerms(terms);
 		List<String> results = new ArrayList<>();
 

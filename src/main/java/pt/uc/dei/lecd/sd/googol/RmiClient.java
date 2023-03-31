@@ -55,10 +55,9 @@ public class RmiClient {
 					// Consultar os resultados da pesquisa
 					System.out.print("Digite os termos da pesquisa: ");
 					String termos = sc.nextLine();
-					sm.searchResults(termos);
-					if (registoLogin) {
-						// TODO: Fix listpages
-						// sm.listPages(termos);
+					List<String> pages = sm.searchResults(termos);
+					for (String page : pages) {
+						System.out.println(page);
 					}
 					break;
 

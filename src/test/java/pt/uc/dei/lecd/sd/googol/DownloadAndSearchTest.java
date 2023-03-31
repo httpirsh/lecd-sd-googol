@@ -27,13 +27,13 @@ public class DownloadAndSearchTest {
     static void init() throws RemoteException, MalformedURLException, NotBoundException, AlreadyBoundException {
         registry = TestUtils.getRegistryInstance(1090);
 
-        registry.bind("googoltest/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
+        registry.bind("DownloadAndSearchTest/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
 
         downloader = new Downloader("downloader_1");
-        downloader.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
+        downloader.connectToBarrel("//localhost:1090/DownloadAndSearchTest/barrels/barrel_1");
 
         searchModule = new RmiSearchModule("search");
-        searchModule.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
+        searchModule.connectToBarrel("//localhost:1090/DownloadAndSearchTest/barrels/barrel_1");
     }
 
     /**
@@ -68,8 +68,8 @@ public class DownloadAndSearchTest {
     @Test
     void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException {
         RMIQueue queue = new RMIQueue("testQueue");
-        registry.bind("googoltest/queue", queue);
-        downloader.connectToQueue("//localhost:1090/googoltest/queue");
+        registry.bind("DownloadAndSearchTest/queue", queue);
+        downloader.connectToQueue("//localhost:1090/DownloadAndSearchTest/queue");
 
         queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
 

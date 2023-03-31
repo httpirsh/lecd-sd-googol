@@ -181,6 +181,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		return topTerms;
 	}
 
+
 	/**
 	 * O método listPages imprime a lista de páginas que têm ligação para um determinado URL.
 	 *

@@ -94,6 +94,9 @@ public class Downloader implements Remote {
             log.error("Unable to index url {} to barrel", url, e);
             return false;
         }
+
+        // indexar recursivamente:
+        indexURL(getNextURL(ba), ba);
     }
 
     /**

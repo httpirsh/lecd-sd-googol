@@ -74,7 +74,7 @@ public class RmiClient {
 					break;
 
 				case 3:
-					//List<String> barrels_downloaders_ativos =
+					// List<String> barrels_downloaders_ativos
 					// Mostrar top 10 de pesquisas
 					List<String> top10 = search.getTopSearches(10);
 					System.out.println("As 10 pesquisas mais comuns.");
@@ -93,7 +93,7 @@ public class RmiClient {
 			}
 		} while (opcao != 4);
 	}
-	
+
     	
     	public static boolean registoLogin(Scanner sc) {
     	    boolean registo = false;

@@ -21,10 +21,6 @@ public interface Queue extends Remote {
     /**
      * O método size retorna o número de elementos na fila.
      */
-    public int size() throws RemoteException ;
-
-    /**
-     * O método isEmpty retorna um valor booleano que indica se a fila está vazia ou não.
-     */
-    public boolean isEmpty() throws RemoteException;
+    public int size() throws RemoteException;
 }
+

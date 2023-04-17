@@ -97,39 +97,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     	pageLinks.put(url, links);
     }
 
-    /**
-     * O método getQueue retorna a lista de URLs armazenados na fila de rastreamento (urlsQueue).
-     */
-    public ArrayList<String> getQueue (){
-    	return urlsQueue;
-    }
-
-    /**
-     * O método newQueue é utilizado para atualizar a fila de URLs.
-     */
-    public void newQueue(ArrayList<String> newQueue) {
-    	this.urlsQueue = newQueue;
-    }
-
-    /**
-     * O método addIndexedURL é responsável por adicionar um URL à lista de URLs já visatados.
-     * Esta lista é importante para evitar que o mesmo URL seja visitado novamente durante o
-     * processo de indexação.
-     */
-    public void addIndexedUrl(String url) {
-    	this.indexedUrls.add(url);
-    }
-
-    /**
-     * O método addToQueue é responsável por adicionar um URL à fila de URLs, desde que esse URL
-     * ainda não tenha sido indexado. Essa verificação é feita utilizando o método 'contains',
-     * que verifica se o URL já está contido no conjunto de URLs indexados.
-     */
-    public void addToQueue(String url) {
-    	if(!indexedUrls.contains(url))
-    		this.urlsQueue.add(url);
-    		
-    }
 
     /**
      * O método urlConnections é usado para contabilizar o número de ligações de outras páginas
@@ -138,17 +105,17 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
      * Ele recebe um URL como entrada e, em seguida, incrementa uma unidade ao valor associado a
      * esse URL no HashMap pageLinkCounts, o qual representa o número de ligações para essa página.
      */
-    public void urlConnections(String url) {
+    public void urlConnections(String url) {       //needs to be syncronized.
     	Integer num = pageLinkCounts.getOrDefault(url, 0);
         pageLinkCounts.put(url, num + 1);
     }
-
 
     /**
      * O método searchTerm tem como objetivo retornar a lista de URLs contenham um determinado termo
      * (passado como parâmetro) ou null, caso não haja URLs correspondentes.
      */
     public HashSet<String> searchTerm(String term)  {
+
         return invertedIndex.getOrDefault(term.toLowerCase(), null);
     }
 
@@ -170,17 +137,17 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     public HashSet <String> searchTerms(String terms)  {
         StringTokenizer tokens = new StringTokenizer(terms, " ,:/.?'_");
         HashSet<String> results = searchTerm(tokens.nextToken());
-        if(results == null)
+        if (results == null)
         	return null;
-        
+
         while(tokens.hasMoreElements()) {
         	HashSet<String> token_result = searchTerm(tokens.nextToken());
         	token_result.retainAll(results);
         	if (token_result.size() == 0)
         		return null;
-        	
+
         	results = token_result;
-        }  
+        }
         return sortImp(results);
     }
 
@@ -198,14 +165,14 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
      */
     public HashSet <String> sortImp(HashSet <String> results) {
     	HashSet <String> sortedImp = new HashSet<>();
-    	int max;
-    	String greaterImportance;
-    	for(int i=1; i<=results.size(); i++) {
-    		max=0;
+        String greaterImportance;
+    	for (int i=1; i<=results.size(); i++) {
+    		int max = 0;
     		greaterImportance = "";
     		for(String result: results) {
-    			if(!sortedImp.contains(result) && pageLinkCounts.get(result) >= max) {
-    				max = pageLinkCounts.get(result);
+                log.debug("sortedImp is {} and pageLinkCounts is {} and result is {}", sortedImp, pageLinkCounts, result);
+    			if(!sortedImp.contains(result) && pageLinkCounts.getOrDefault(result, 0) >= max) {
+    				max = pageLinkCounts.getOrDefault(result, 0);
     				greaterImportance = result;
     			}
     		}
@@ -222,25 +189,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         return pageTitles.get(url);
     }
 
-    /**
-     * O método getPagesWithLinkTo retorna uma lista de URLs têm ligação para uma página
-     * específica.
-     *
-     * O método percorre todas as páginas armazenadas no HashMap pageLinks e verifica se
-     * cada uma contém ligação para a página especificada pelo parâmetro 'url'. Se uma
-     * página contiver ligação para essa página, seu URL é adiconado à lista pagesWithLink.
-     * Por fim, essa lista é retornada como resultado da consulta.
-     */
-    public ArrayList<String> getPagesWithLinkTo(String url){
-        ArrayList<String> pagesWithLink = new ArrayList<String>();
-        for (String pageUrl : pageLinks.keySet()) {
-            ArrayList<String> links = pageLinks.get(pageUrl);
-            if (links.contains(url)) {
-                pagesWithLink.add(pageUrl);
-            }
-        }
-        return pagesWithLink;
-    }
 
     /**
      * O método getShortQuote retonar uma citação curta de uma determinada página, a qual é

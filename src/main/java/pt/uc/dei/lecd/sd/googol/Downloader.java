@@ -1,6 +1,5 @@
 package pt.uc.dei.lecd.sd.googol;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -55,7 +54,7 @@ public class Downloader implements Remote, Runnable {
     }
 
     public boolean indexURL(String url) throws RemoteException {
-        // download da pagina Web
+        // download da página Web
         Document doc = null;
         try {
             doc = Jsoup.connect(url).get();
@@ -72,18 +71,18 @@ public class Downloader implements Remote, Runnable {
             // dividir o texto em tokens individuais
             StringTokenizer tokens = new StringTokenizer(text, " ,:/.?'_");
             while (tokens.hasMoreElements())
-                barrel.addToIndex(tokens.nextToken().toLowerCase(), url); // adicionar a palavra ao indice invertido
+                barrel.addToIndex(tokens.nextToken().toLowerCase(), url); // Adicionar a palavra ao índice invertido
 
             for (String link : linkList) {
                 enqueue(link); // Adicionar link à queue para indexar recursivamente
                 barrel.urlConnections(link); // Atualizar o número de ligações da página linkada
             }
 
-            barrel.addPageTitle(url, title); // Adicionar o titulo da pagina ao indice
-            barrel.addPageContents(url, text); // Adicionar o texto da pagina ao indice
-            barrel.addPageLinks(url, linkList); // Adicionar os links encontrados na pagina ao indice
+            barrel.addPageTitle(url, title); // Adicionar o título da página ao índice
+            barrel.addPageContents(url, text); // Adicionar o texto da página ao índice
+            barrel.addPageLinks(url, linkList); // Adicionar os links encontrados na página ao índice
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Unable to index url {} to barrel", url, e);
             return false;
         }

@@ -3,7 +3,6 @@ package pt.uc.dei.lecd.sd.googol;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,7 +43,4 @@ public class RMIQueue extends UnicastRemoteObject implements Queue {
         return queue.size();
     }
 
-    public synchronized boolean isEmpty() throws RemoteException {
-        return queue.isEmpty();
-    }
 }

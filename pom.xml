@@ -113,6 +113,22 @@
                             </archive>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>make-barrel</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>barrel</classifier>
+                            <finalName>barrel</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>pt.uc.dei.lecd.sd.googol.IndexStorageBarrel</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

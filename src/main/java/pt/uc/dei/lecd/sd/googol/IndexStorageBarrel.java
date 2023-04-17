@@ -1,10 +1,15 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.rmi.AlreadyBoundException;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 
 /**
  * A classe IndexStorageBarrel é responsável por armazenar informações sobre páginas web,
@@ -214,16 +219,6 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         return "pong";
     }
 
-    public static void main(String [] args) throws RemoteException {
-		log.info("Starting IndexStorageBarrel...");
-		IndexStorageBarrel barrel = new IndexStorageBarrel("IndexStorageBarrel");
-        LocateRegistry.createRegistry(1099).rebind("IndexStorageBarrel", barrel);
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Press any key to stop IndexStorageBarrel...");
-        scanner.nextLine();
-        scanner.close();
-	}
-
     @Override
     public void callback(String downloader) {
         this.callbacks.add(downloader);
@@ -233,4 +228,54 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     public String getCallbacks() throws RemoteException {
         return this.callbacks.toString();
     }
+
+    public boolean start(int port, String app) {
+        try {
+            String path = app + "/barrels/" + name;
+            log.info("Starting object {} at rmi://localhost:{}/{}", name, port, path);
+
+            Registry reg = LocateRegistry.getRegistry(port);
+            reg.bind(path, this);
+
+            return true;
+        } catch (RemoteException | AlreadyBoundException e) {
+            log.error("Error starting {} object.", name, e);
+            return false;
+        } 
+    }
+
+    public boolean stop() {
+        try {
+            return unexportObject(this, false);
+        } catch (NoSuchObjectException e) {
+            log.error("Error stopping object {}", name, e);
+            return false;
+        }
+    }
+
+    public static void main(String[] args) throws RemoteException {
+		log.info("Starting IndexStorageBarrel...");
+        String app = args[0];
+        int port = Integer.parseInt(args[1]);
+        String name = args[2];
+
+        LocateRegistry.createRegistry(port);
+        IndexStorageBarrel barrel;
+        barrel = new IndexStorageBarrel(name);
+        barrel.start(port, app);
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Press any key to stop IndexStorageBarrel...");
+        scanner.nextLine();
+        scanner.close();
+        if (barrel.stop()) {
+            System.out.println("Closed with success.");
+            System.exit(0);
+        } else {
+            System.out.println("Error closing object.");
+            System.exit(1);
+        }
+	}
+
+
 }

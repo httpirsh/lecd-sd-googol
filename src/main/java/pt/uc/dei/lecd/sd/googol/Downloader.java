@@ -146,4 +146,8 @@ public class Downloader implements Remote, Runnable {
         }
         log.info("Downloader {} stopped.", this.name);
     }
+
+    public static void main(String[] args) {
+        
+    }
 }

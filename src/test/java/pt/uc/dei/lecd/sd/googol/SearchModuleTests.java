@@ -27,7 +27,7 @@ public class SearchModuleTests {
 
         registry.bind("SearchModuleTests/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
 
-        downloader = new Downloader("downloader_1");
+        downloader = new Downloader();
         downloader.connectToBarrel("//localhost:1090/SearchModuleTests/barrels/barrel_1");
 
         searchModule = new RmiSearchModule("search");

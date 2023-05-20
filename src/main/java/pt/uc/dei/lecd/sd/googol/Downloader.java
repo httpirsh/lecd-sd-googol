@@ -1,13 +1,26 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import java.net.MalformedURLException;
+import java.rmi.AccessException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.StringTokenizer;
+
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,20 +36,21 @@ import org.jsoup.select.Elements;
  * Cada URL é indexado apenas por um Downloader que irá passar os resultados para os Storage Barrels.
  */
 @Slf4j
-public class Downloader implements Remote, Runnable {
+public class Downloader extends UnicastRemoteObject implements Runnable {
 
-    private final String name;
+    private String name;
     private InterfaceBarrel barrel;
     private Queue queue;
     private boolean running;
+    private Thread processingThread;
+    private Registry registry;
 
-    public Downloader(String name) {
-        this.name = name;
+    public Downloader() throws RemoteException {
         this.running = false;
     }
 
     /**
-     * Connects to an Index Storage Barrel
+     * Connects to an Index Storage Barrel.
      * @param url The url where the barrel is located
      * @return true is the connection was successfull, false otherwise
      * @throws RemoteException
@@ -109,9 +123,18 @@ public class Downloader implements Remote, Runnable {
 
     /**
      * Stops the downloader thread.
+     * @throws InterruptedException
+     * @throws NotBoundException
+     * @throws RemoteException
+     * @throws AccessException
      */
-    public void stop() {
+    public void stop() throws InterruptedException, AccessException, RemoteException, NotBoundException {
         this.running = false;
+        log.info("Downloader " + getName() + " stopping... waiting for processing thread to finish.");
+        processingThread.join();
+        registry.unbind("/googol/downloaders/" + getName());
+        UnicastRemoteObject.unexportObject(this, true);
+        log.info("Downloader " + getName() + " stopped.");
     }
 
     /**
@@ -119,9 +142,9 @@ public class Downloader implements Remote, Runnable {
      */
     public void start() {
         if (!running) {
-            Thread t = new Thread(this);
-            t.setName("thread_" + name);
-            t.start();
+            processingThread = new Thread(this);
+            processingThread.setName("thread_" + name);
+            processingThread.start();
         }
     }
 
@@ -147,7 +170,77 @@ public class Downloader implements Remote, Runnable {
         log.info("Downloader {} stopped.", this.name);
     }
 
-    public static void main(String[] args) {
+    /**
+     * Regista-se no registo rmi indicado.
+     * 
+     * @param host  A máquina onde está o registo
+     * @param port  O porto onde está o registo na máquina
+     * @throws RemoteException  Em caso de erro de ligação
+     */
+    public void connect(String host, int port) throws RemoteException {
+        registry = LocateRegistry.getRegistry(host, port);
+
+        RegistryEntries entries = new RegistryEntries(registry.list());
+        this.name = entries.getNextDownloaderName();
+
+        registry.rebind("/googol/downloaders/" + name, this);
         
+        connectToQueue(RegistryEntries.getQueueUri(host, port));
+        connectToBarrel(RegistryEntries.getBarrelUri(host, port));
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public static void main(String[] args) {
+        String host = "localhost"; // Default host
+        int port = 1099; // Default port
+
+        Options options = new Options();
+        options.addOption(Option.builder("h")
+            .longOpt("host")
+            .hasArg().desc("RMI googol registry host")
+            .build());
+        options.addOption(Option.builder("p")
+            .longOpt("port")
+            .hasArg().desc("RMI googol registry port")
+            .build());
+
+        try {
+            CommandLineParser parser = new DefaultParser();
+            CommandLine cmd = parser.parse(options, args);
+
+            if (cmd.hasOption("h")) {
+                host = cmd.getOptionValue("h");
+            }
+
+            if (cmd.hasOption("p")) {
+                port = Integer.parseInt(cmd.getOptionValue("p"));
+            }
+        } catch (ParseException | NumberFormatException e) {
+            System.err.println("Error parsing command line arguments: " + e.getMessage());
+            printUsage(options);
+            System.exit(1);
+        }
+
+        try {
+            Downloader downloader = new Downloader();
+            downloader.connect(host, port);
+            downloader.start();
+            System.out.println("Googol downloader started with name " + downloader.getName());
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Press any key to stop downloader...");
+            scanner.nextLine();
+            scanner.close();
+            downloader.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void printUsage(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("Downloader", options);
     }
 }

@@ -29,7 +29,7 @@ public class DownloadAndSearchTest {
 
         registry.bind("DownloadAndSearchTest/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
 
-        downloader = new Downloader("downloader_1");
+        downloader = new Downloader();
         downloader.connectToBarrel("//localhost:1090/DownloadAndSearchTest/barrels/barrel_1");
 
         searchModule = new RmiSearchModule("search");
@@ -61,14 +61,17 @@ public class DownloadAndSearchTest {
      * Para isso, o teste utiliza um objeto RMIQueue para armazenar várias URLs e
      * adicioná-las à fila do objeto Downloader para download e indexação.
      * O teste verifica se o tamanho da fila é maior que 1 após o término da execução do Downloader.
+     * 
      * @throws RemoteException
      * @throws AlreadyBoundException
      * @throws InterruptedException
+     * @throws NotBoundException
      */
     @Test
-    void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException {
-        RMIQueue queue = new RMIQueue("testQueue");
+    void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException {
+        RMIQueue queue = new RMIQueue();
         registry.bind("DownloadAndSearchTest/queue", queue);
+        downloader.connect("localhost", 1090);
         downloader.connectToQueue("//localhost:1090/DownloadAndSearchTest/queue");
 
         queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");

@@ -1,6 +1,8 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RMIQueue extends UnicastRemoteObject implements Queue {
     private LinkedList<Object> queue;
-    private String name;
 
-    public RMIQueue(String name) throws RemoteException {
+    public RMIQueue() throws RemoteException {
         super();
-        this.name = name;
         queue = new LinkedList<Object>();
-        log.info("Creating queue {}", this.name);
+        log.info("Creating queue");
     }
 
     public synchronized void enqueue(Object element) throws RemoteException {
@@ -41,6 +41,11 @@ public class RMIQueue extends UnicastRemoteObject implements Queue {
 
     public synchronized int size() throws RemoteException {
         return queue.size();
+    }
+
+    public void connect(String host, int port) throws RemoteException {
+        Registry registry = LocateRegistry.getRegistry(host, port);
+        registry.rebind("/googol/queue", this);
     }
 
 }

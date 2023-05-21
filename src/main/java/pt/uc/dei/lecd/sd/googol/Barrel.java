@@ -11,6 +11,14 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 /**
  * A classe IndexStorageBarrel é responsável por armazenar informações sobre páginas web,
  * permitindo que os usuários possam realizar as funcionalidades estabelecidas para este
@@ -253,27 +261,25 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
     }
 
     public static void main(String[] args) throws RemoteException {
-		log.info("Starting IndexStorageBarrel...");
-        String app = args[0];
-        int port = Integer.parseInt(args[1]);
+		ArgumentsProcessor arguments = new ArgumentsProcessor(args);
+        String host = arguments.getHost();
+        int port = arguments.getPort();
 
-        LocateRegistry.createRegistry(port);
-        Barrel barrel;
-        barrel = new Barrel();
-        barrel.start("localhost", port, app);
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Press any key to stop IndexStorageBarrel...");
-        scanner.nextLine();
-        scanner.close();
-        if (barrel.stop()) {
-            System.out.println("Closed with success.");
-            System.exit(0);
-        } else {
-            System.out.println("Error closing object.");
-            System.exit(1);
+        try {
+            Downloader downloader = new Downloader();
+            downloader.connect(host, port);
+            downloader.start();
+            System.out.println("Googol downloader started with name " + downloader.getName());
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Press any key to stop downloader...");
+            scanner.nextLine();
+            scanner.close();
+            downloader.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 	}
 
+   
 
 }

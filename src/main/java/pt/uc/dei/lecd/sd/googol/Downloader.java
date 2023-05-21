@@ -194,35 +194,9 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
     }
 
     public static void main(String[] args) {
-        String host = "localhost"; // Default host
-        int port = 1099; // Default port
-
-        Options options = new Options();
-        options.addOption(Option.builder("h")
-            .longOpt("host")
-            .hasArg().desc("RMI googol registry host")
-            .build());
-        options.addOption(Option.builder("p")
-            .longOpt("port")
-            .hasArg().desc("RMI googol registry port")
-            .build());
-
-        try {
-            CommandLineParser parser = new DefaultParser();
-            CommandLine cmd = parser.parse(options, args);
-
-            if (cmd.hasOption("h")) {
-                host = cmd.getOptionValue("h");
-            }
-
-            if (cmd.hasOption("p")) {
-                port = Integer.parseInt(cmd.getOptionValue("p"));
-            }
-        } catch (ParseException | NumberFormatException e) {
-            System.err.println("Error parsing command line arguments: " + e.getMessage());
-            printUsage(options);
-            System.exit(1);
-        }
+        ArgumentsProcessor arguments = new ArgumentsProcessor(args);
+        String host = arguments.getHost();
+        int port = arguments.getPort();
 
         try {
             Downloader downloader = new Downloader();
@@ -239,8 +213,4 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
         }
     }
 
-    private static void printUsage(Options options) {
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("Downloader", options);
-    }
 }

@@ -24,7 +24,7 @@ public class GoogolCluster {
         Barrel barrel1 = new Barrel();
         Barrel barrel2 = new Barrel();
 
-        RmiSearchModule search = new RmiSearchModule("search");
+        Search search = new Search();
 
         Downloader downloader1 = new Downloader();
         Downloader downloader2 = new Downloader();

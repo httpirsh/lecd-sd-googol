@@ -88,48 +88,17 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>googolclient</classifier>
-                            <finalName>client</finalName>
-                            <archive>
-                                <manifest>
-                                    <mainClass>pt.uc.dei.lecd.sd.googol.GoogolClient</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>make-downloader</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <classifier>googoldownloader</classifier>
+                            <classifier>downloader</classifier>
                             <finalName>downloader</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>pt.uc.dei.lecd.sd.googol.Downloader</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>make-assembly2</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>googolcluster</classifier>
-                            <finalName>cluster</finalName>
-                            <archive>
-                                <manifest>
-                                    <mainClass>pt.uc.dei.lecd.sd.googol.GoogolCluster</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
@@ -146,6 +115,38 @@
                             <archive>
                                 <manifest>
                                     <mainClass>pt.uc.dei.lecd.sd.googol.Barrel</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-queue</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>queue</classifier>
+                            <finalName>queue</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>pt.uc.dei.lecd.sd.googol.RemoteQueue</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-search</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>search</classifier>
+                            <finalName>search</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>pt.uc.dei.lecd.sd.googol.Search</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

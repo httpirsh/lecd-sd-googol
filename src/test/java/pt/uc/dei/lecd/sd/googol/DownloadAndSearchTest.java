@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 public class DownloadAndSearchTest {
 
-    private static RmiSearchModule searchModule;
+    private static Search searchModule;
     private static Registry registry;
 
     @BeforeAll
@@ -31,7 +31,7 @@ public class DownloadAndSearchTest {
 
         registry.bind("googol/barrels/barrel_1", new Barrel());
 
-        searchModule = new RmiSearchModule("search");
+        searchModule = new Search();
         searchModule.connectToBarrel("//localhost:1090/googol/barrels/barrel_1");
     }
 

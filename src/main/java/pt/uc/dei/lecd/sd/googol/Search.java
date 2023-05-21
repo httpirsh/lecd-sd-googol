@@ -1,10 +1,12 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import java.net.MalformedURLException;
+import java.rmi.AccessException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
+import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
@@ -25,14 +27,14 @@ import lombok.extern.slf4j.Slf4j;
  * fornecer os resultados precisos aos clientes.
  */
 @Slf4j
-public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSearchModule {
+public class Search extends UnicastRemoteObject implements InterfaceSearchModule {
 
-	private final String name;
 	List<String> searchLogs = new ArrayList<>();
 	private InterfaceBarrel barrel;
 	private RemoteQueue queue;
 	private static final long serialVersionUID = 1L;
 	private final ArrayList<String> connected;
+	private GoogolRegistry registry;
 
 	/**
 	 * O método main da classe tem a responsabilidade de iniciar o RMI Search Module, que permite
@@ -48,40 +50,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	 * novamente. Isso é feito até que o número máximo de tentativas definido seja atingido. Se todas
 	 * as tentativas falharem, uma mensagem de erro é exibida.
 	 */
-	public static void main(String[] args) throws RemoteException, MalformedURLException, NotBoundException {
-
-		int tentativas = 0;
-		while (tentativas < 5) {
-			try {
-				RmiSearchModule sm = new RmiSearchModule("search-1");
-				LocateRegistry.getRegistry().rebind("SearchModule", sm);
-				sm.connectToBarrel("rmi://localhost:1099/IndexStorageBarrel");
-				System.out.println("RMI Search Module ativo ...");
-				System.out.print("Press any key to stop IndexStorageBarrel...");
-				Scanner scanner = new Scanner(System.in);
-        		scanner.nextLine();
-        		scanner.close();
-				System.exit(0);
-			} catch (RemoteException | MalformedURLException | NotBoundException re) {
-				log.error("Erro ao iniciar o RMI Search Module:", re);
-				System.out.println("Erro ao iniciar o RMI Search Module: " + re.getMessage());
-				System.out.println("Tentando se reconectar em 5 segundos...");
-
-				try {
-					Thread.sleep(5000);
-
-				} catch (InterruptedException ie) {
-					Thread.currentThread().interrupt(); // interrompe a thread atual
-				}
-				tentativas++;
-			}
-		}
-		if (tentativas == 5)
-			System.out.println("Não foi possível ativar o RMI Search Module.");
-	}
-
-	public RmiSearchModule(String name) throws MalformedURLException, NotBoundException, RemoteException {
-		this.name = name;
+	public Search() throws MalformedURLException, NotBoundException, RemoteException {
 		this.connected = new ArrayList<>();
 	}
 	public void connectToBarrel(String url) throws MalformedURLException, NotBoundException, RemoteException {
@@ -144,7 +113,6 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		} else {
 			log.warn("Not connected to queue. Index request for {} was ignored.", url);
 		}
-
 	}
 
 	@Override
@@ -192,13 +160,13 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	}
 
 	public boolean connectToQueue(String url) {
-		log.info("SearchModule {} connecting to {}", name, url);
+		log.info("Search connecting to {}", url);
         try {
             this.queue = (RemoteQueue) Naming.lookup(url);
 			this.connected.add(queue.toString());
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            log.error("Failed while connecting {} to {}", name, url, e);
+            log.error("Failed while connecting search to {}", url, e);
             return false;
         }
 	}
@@ -209,4 +177,49 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 		String connected = this.connected.toString();
 		return callbacks.concat(connected);
 	}
+
+	public static void main(String[] args) throws RemoteException {
+		ArgumentsProcessor arguments = new ArgumentsProcessor(args);
+        String host = arguments.getHost();
+        int port = arguments.getPort();
+
+        try {
+            Search search = new Search();
+            search.start(host, port);
+            System.out.println("Googol search started.");
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Press any key to stop search...");
+            scanner.nextLine();
+            scanner.close();
+            search.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+	}
+    public boolean start(String host, int port) {
+        try {
+            log.info("Starting search at rmi://{}:{}/{}", host, port);
+            registry = new GoogolRegistry(host, port);
+            registry.bind(this);
+            return true;
+        } catch (RemoteException | AlreadyBoundException e) {
+            log.error("Error starting search module.", e);
+            return false;
+        } 
+    }
+
+    public boolean stop() throws AccessException, RemoteException, NotBoundException {
+        try {
+            log.info("Stopping search module...");
+            return registry.unbind(this);
+        } catch (NoSuchObjectException e) {
+            log.error("Error stopping search module.", e);
+            return false;
+        }
+    }
+
+	InterfaceBarrel getBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
+		return registry.getBarrelInRoundRobin();
+	}
+
 }

@@ -181,7 +181,7 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
         registry.bind(name, this);
         
         connectToQueue(GoogolRegistry.getQueueUri(host, port));
-        connectToBarrel(GoogolRegistry.getBarrelUri(host, port));
+        connectToBarrel(GoogolRegistry.getBarrelUri("barrel_1", host, port));
     }
 
     public String getName() {

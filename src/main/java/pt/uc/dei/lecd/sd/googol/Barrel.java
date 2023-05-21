@@ -7,8 +7,6 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
@@ -252,6 +250,10 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public static void main(String[] args) throws RemoteException {
 		ArgumentsProcessor arguments = new ArgumentsProcessor(args);
         String host = arguments.getHost();
@@ -270,9 +272,5 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
             e.printStackTrace();
         }
 	}
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
 }

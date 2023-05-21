@@ -18,7 +18,7 @@ import java.util.List;
 public class SearchModuleTests {
 
     private static Downloader downloader;
-    private static RmiSearchModule searchModule;
+    private static Search searchModule;
     private static Registry registry;
 
     @BeforeAll
@@ -30,7 +30,7 @@ public class SearchModuleTests {
         downloader = new Downloader();
         downloader.connectToBarrel("//localhost:1090/SearchModuleTests/barrels/barrel_1");
 
-        searchModule = new RmiSearchModule("search");
+        searchModule = new Search();
         searchModule.connectToBarrel("//localhost:1090/SearchModuleTests/barrels/barrel_1");
     }
 

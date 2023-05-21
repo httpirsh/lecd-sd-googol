@@ -1,7 +1,9 @@
 package pt.uc.dei.lecd.sd.googol;
 
+import java.net.MalformedURLException;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -19,18 +21,25 @@ public class GoogolRegistry {
 
     private List<String> entries;
     private Registry registry;
+    private String lastBarrelNameReturnedForRoundRobin = null;
+    private String host;
+    private int port;
+
 
     /**
      * Cria uma instância de RegistryEntries com base numa lista de entries de registry.
      * 
      * @param entries   O array de entradas no registry
      */
-    public GoogolRegistry(String[] entries) {
+    protected GoogolRegistry(String[] entries) {
         this.entries = Arrays.asList(entries);
     }
 
     public GoogolRegistry(String host, int port) throws RemoteException {
-        registry = LocateRegistry.getRegistry(host, port);
+        this.host = host;
+        this.port = port;
+        this.registry = LocateRegistry.getRegistry(host, port);
+        updateEntries();
     }
 
     /**
@@ -77,8 +86,8 @@ public class GoogolRegistry {
         return "rmi://" + host + ":" + port + "/googol/queue";
     }
 
-    public static String getBarrelUri(String host, int port) {
-        return "rmi://" + host + ":" + port + "/googol/barrels/barrel_1"; //TODO: Still missing support for multiple barrels
+    public static String getBarrelUri(String name, String host, int port) {
+        return "rmi://" + host + ":" + port + "/googol/barrels/" + name;
     }
 
     public String getNextBarrelName() {
@@ -134,5 +143,41 @@ public class GoogolRegistry {
     public boolean unbind(RemoteQueue remoteQueue) throws AccessException, RemoteException, NotBoundException {
         registry.unbind("googol/queue");
         return UnicastRemoteObject.unexportObject(remoteQueue, false);
+    }
+
+    public void bind(Search search) throws AccessException, RemoteException, AlreadyBoundException {
+        registry.bind("googol/search", search);
+    }
+
+    public boolean unbind(Search search) throws AccessException, RemoteException, NotBoundException {
+        registry.unbind("googol/search");
+        return UnicastRemoteObject.unexportObject(search, false);
+    }
+
+    public InterfaceBarrel getBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
+        updateEntries();
+        String barrelName = getNextBarrelNameInRoundRobin();
+        return (InterfaceBarrel) Naming.lookup(getBarrelUri(barrelName, host, port));
+    }
+
+    protected String getNextBarrelNameInRoundRobin() {
+        List<String> barrels = getListOfBarrels();
+
+        if (barrels.isEmpty()) {
+            return null;
+        }
+
+        if (lastBarrelNameReturnedForRoundRobin == null) {
+            lastBarrelNameReturnedForRoundRobin = barrels.get(0);
+        } else {
+            int index = Integer.parseInt(lastBarrelNameReturnedForRoundRobin.split("_")[1]);
+            if (index < barrels.size()) {
+                lastBarrelNameReturnedForRoundRobin = barrels.get(index);
+            } else {
+                lastBarrelNameReturnedForRoundRobin = barrels.get(0);
+            }
+        }
+
+        return lastBarrelNameReturnedForRoundRobin;
     }
 }

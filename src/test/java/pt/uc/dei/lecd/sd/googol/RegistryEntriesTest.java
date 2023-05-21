@@ -1,5 +1,7 @@
 package pt.uc.dei.lecd.sd.googol;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -45,6 +47,27 @@ public class RegistryEntriesTest {
         String[] entries = {"googol/downloaders/downloader_2"};
         GoogolRegistry reg = new GoogolRegistry(entries);
         Assertions.assertEquals("googol/downloaders/downloader_3", reg.getNextDownloaderName());
+    }
+
+    @Test 
+    void shouldGetARandomBarrel() {
+        String[] entries = {
+            "googol/barrels/barrel_1",
+            "googol/barrels/barrel_2",
+            "googol/barrels/barrel_3",
+            "googol/barrels/barrel_4",
+            "googol/barrels/barrel_5",
+            "googol/barrels/barrel_6",
+            "googol/barrels/barrel_7",
+            "googol/barrels/barrel_8",
+            "googol/barrels/barrel_9",
+        };
+
+        GoogolRegistry reg = new GoogolRegistry(entries);
+
+        for (String entry: entries) {
+            assertEquals(entry, reg.getNextBarrelNameInRoundRobin());
+        }
     }
 
 }

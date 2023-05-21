@@ -24,7 +24,7 @@ import java.util.function.BooleanSupplier;
  */
 
 @Slf4j
-public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel{
+public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
 
 	private static final long serialVersionUID = 1L;
     private String name;
@@ -40,7 +40,7 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     /**
      * Construtor da classe que inicializa os atributos da classe
      */
-    public IndexStorageBarrel() throws RemoteException {
+    public Barrel() throws RemoteException {
         this.invertedIndex = new HashMap<>();
         this.pageTitles = new HashMap<>();
         this.pageContents = new HashMap<>();
@@ -258,8 +258,8 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         int port = Integer.parseInt(args[1]);
 
         LocateRegistry.createRegistry(port);
-        IndexStorageBarrel barrel;
-        barrel = new IndexStorageBarrel();
+        Barrel barrel;
+        barrel = new Barrel();
         barrel.start("localhost", port, app);
 
         Scanner scanner = new Scanner(System.in);

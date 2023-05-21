@@ -21,8 +21,8 @@ public class GoogolCluster {
         Registry registry = LocateRegistry.createRegistry(port);
         log.info("Registry ok");
 
-        IndexStorageBarrel barrel1 = new IndexStorageBarrel();
-        IndexStorageBarrel barrel2 = new IndexStorageBarrel();
+        Barrel barrel1 = new Barrel();
+        Barrel barrel2 = new Barrel();
 
         RmiSearchModule search = new RmiSearchModule("search");
 

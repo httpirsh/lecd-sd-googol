@@ -22,7 +22,6 @@ import java.util.List;
 @Slf4j
 public class DownloadAndSearchTest {
 
-    private static Downloader downloader;
     private static RmiSearchModule searchModule;
     private static Registry registry;
 

@@ -76,7 +76,7 @@ public class RemoteQueue extends UnicastRemoteObject implements Queue {
         }
 	}
 
-    private boolean stop() throws AccessException, RemoteException, NotBoundException {
+    public boolean stop() throws AccessException, RemoteException, NotBoundException {
         try {
             log.info("Stopping queue");
             return registry.unbind(this);

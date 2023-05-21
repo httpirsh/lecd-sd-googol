@@ -2,7 +2,10 @@ package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -27,13 +30,10 @@ public class DownloadAndSearchTest {
     static void init() throws RemoteException, MalformedURLException, NotBoundException, AlreadyBoundException {
         registry = TestUtils.getRegistryInstance(1090);
 
-        registry.bind("DownloadAndSearchTest/barrels/barrel_1", new Barrel());
-
-        downloader = new Downloader();
-        downloader.connectToBarrel("//localhost:1090/DownloadAndSearchTest/barrels/barrel_1");
+        registry.bind("googol/barrels/barrel_1", new Barrel());
 
         searchModule = new RmiSearchModule("search");
-        searchModule.connectToBarrel("//localhost:1090/DownloadAndSearchTest/barrels/barrel_1");
+        searchModule.connectToBarrel("//localhost:1090/googol/barrels/barrel_1");
     }
 
     /**
@@ -46,7 +46,11 @@ public class DownloadAndSearchTest {
      */
     @Test
     void Should_find_document_After_index() throws RemoteException {
-        assertTrue(downloader.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
+
+        Downloader victim = new Downloader();
+        victim.connectToBarrel("//localhost:1090/googol/barrels/barrel_1");
+
+        assertTrue(victim.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
 
         List<String> results = searchModule.searchResults("Stranger");
 
@@ -71,14 +75,17 @@ public class DownloadAndSearchTest {
     void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException {
         RemoteQueue queue = new RemoteQueue();
         queue.start("localhost", 1090);
-        downloader.connect("localhost", 1090);
-
+        
+        Downloader victim = new Downloader();
+        victim.connectToBarrel("//localhost:1090/googol/barrels/barrel_1");
+        victim.connect("localhost", 1090);
         queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
 
-        downloader.start();
+        victim.start();
         Thread.sleep(5000);
-        downloader.stop();
+        victim.stop();
 
         assertTrue(queue.size() > 1);
+        queue.stop();
     }
 }

@@ -28,7 +28,7 @@ public class DownloadersTest {
     @BeforeAll
     static void init() throws RemoteException{
         registry = TestUtils.getRegistryInstance(1090);
-        registry.rebind("googoltest/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
+        registry.rebind("googoltest/barrels/barrel_1", new IndexStorageBarrel());
         downloader = new Downloader();
         downloader.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
     }

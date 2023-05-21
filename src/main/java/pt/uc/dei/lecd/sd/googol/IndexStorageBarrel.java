@@ -27,14 +27,12 @@ import java.util.function.BooleanSupplier;
 public class IndexStorageBarrel extends UnicastRemoteObject implements InterfaceBarrel{
 
 	private static final long serialVersionUID = 1L;
-    private final String name;
+    private String name;
     private final HashMap<String, HashSet<String>> invertedIndex; // mapa, com o termo como chave e o conjunto de URLs como valor
     private final HashMap<String, String> pageTitles; // mapa de título das páginas, com a URL como chave e o título como valor
     private final HashMap<String, String> pageContents; // mapa de conteúdos de página, com a URL como chave e o conteúdo como valor
     private final HashMap<String, ArrayList<String>> pageLinks; // mapa de links encontrados em cada página, com a URL como chave e a lista de links como valor
     private final HashMap<String, Integer> pageLinkCounts; // mapa de contagem de links de cada página, com a URL como chave e o número de links como valor
-    private ArrayList<String> urlsQueue; // fila de URLs a serem indexadss
-    private final HashSet<String> indexedUrls; // conjunto de URLs já indexados
 
     private final Map<String, Integer> termCounts;
     private final ArrayList<String> callbacks;
@@ -42,15 +40,12 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
     /**
      * Construtor da classe que inicializa os atributos da classe
      */
-    public IndexStorageBarrel(String name) throws RemoteException {
-        this.name = name;
+    public IndexStorageBarrel() throws RemoteException {
         this.invertedIndex = new HashMap<>();
         this.pageTitles = new HashMap<>();
         this.pageContents = new HashMap<>();
         this.pageLinks = new HashMap<>();
         this.pageLinkCounts = new HashMap<>();
-        this.urlsQueue = new ArrayList<>();
-        this.indexedUrls = new HashSet<>();
         this.termCounts = new HashMap<>();
         this.callbacks = new ArrayList<>();
     }
@@ -229,12 +224,16 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
         return this.callbacks.toString();
     }
 
-    public boolean start(int port, String app) {
+    public boolean start(String host, int port, String app) {
         try {
-            String path = app + "/barrels/" + name;
-            log.info("Starting object {} at rmi://localhost:{}/{}", name, port, path);
 
-            Registry reg = LocateRegistry.getRegistry(port);
+            Registry reg = LocateRegistry.getRegistry(host, port);
+
+            RegistryEntries entries = new RegistryEntries(reg.list());
+            name = entries.getNextBarrelName();
+            String path = app + "/barrels/" + name;
+            log.info("Starting {} at rmi://{}:{}/{}", name, host, port, path);
+
             reg.bind(path, this);
 
             return true;
@@ -257,12 +256,11 @@ public class IndexStorageBarrel extends UnicastRemoteObject implements Interface
 		log.info("Starting IndexStorageBarrel...");
         String app = args[0];
         int port = Integer.parseInt(args[1]);
-        String name = args[2];
 
         LocateRegistry.createRegistry(port);
         IndexStorageBarrel barrel;
-        barrel = new IndexStorageBarrel(name);
-        barrel.start(port, app);
+        barrel = new IndexStorageBarrel();
+        barrel.start("localhost", port, app);
 
         Scanner scanner = new Scanner(System.in);
         System.out.print("Press any key to stop IndexStorageBarrel...");

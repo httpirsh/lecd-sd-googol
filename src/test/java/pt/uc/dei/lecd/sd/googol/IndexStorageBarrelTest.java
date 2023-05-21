@@ -21,11 +21,11 @@ public class IndexStorageBarrelTest {
     @Test
     void Should_True_When_StartedAndStoppedMultipleBarrels() throws RemoteException {
 
-        IndexStorageBarrel barrel1 = new IndexStorageBarrel("barrel_1");
-        assertTrue(barrel1.start(port, "googol"));
+        IndexStorageBarrel barrel1 = new IndexStorageBarrel();
+        assertTrue(barrel1.start("localhost", port, "/googol"));
 
-        IndexStorageBarrel barrel2 = new IndexStorageBarrel("barrel_2");
-        assertTrue(barrel2.start(port, "googol"));
+        IndexStorageBarrel barrel2 = new IndexStorageBarrel();
+        assertTrue(barrel2.start("localhost", port, "/googol"));
 
         assertTrue(barrel1.stop());
 

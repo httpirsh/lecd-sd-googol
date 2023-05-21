@@ -25,7 +25,7 @@ public class SearchModuleTests {
     static void init() throws RemoteException, MalformedURLException, NotBoundException, AlreadyBoundException {
         registry = TestUtils.getRegistryInstance(1090);
 
-        registry.bind("SearchModuleTests/barrels/barrel_1", new IndexStorageBarrel("barrel_1"));
+        registry.bind("SearchModuleTests/barrels/barrel_1", new IndexStorageBarrel());
 
         downloader = new Downloader();
         downloader.connectToBarrel("//localhost:1090/SearchModuleTests/barrels/barrel_1");

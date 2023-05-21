@@ -27,15 +27,7 @@ public class RegistryEntries {
      * @return a lista de downloaders.
      */
     public List<String> getListOfDownloaders() {
-        ArrayList<String> downloaders = new ArrayList<>();
-
-        for (String entry: entries) {
-            if (entry.startsWith("/googol/downloaders/downloader_")) {
-                downloaders.add(entry);
-            }
-        }
-
-        return downloaders;
+        return getListStartsWith("/googol/downloaders/downloader_");
     }
 
     /**
@@ -72,6 +64,35 @@ public class RegistryEntries {
 
     public static String getBarrelUri(String host, int port) {
         return "rmi://" + host + ":" + port + "/googol/barrels/barrel_1";
+    }
+
+    public String getNextBarrelName() {
+        List<String> barrels = getListOfBarrels();
+        if (barrels.isEmpty()) {
+            return "barrel_1";
+        }
+        
+        Collections.sort(barrels, Collections.reverseOrder());
+        String highest = barrels.get(0).split("_")[1];
+        int number = Integer.parseInt(highest);
+
+        return "barrel_" + (number + 1);
+    }
+
+    private List<String> getListOfBarrels() {
+        return getListStartsWith("/googol/barrels/barrel_");
+    }
+
+    private List<String> getListStartsWith(String start) {
+        ArrayList<String> itemStrings = new ArrayList<>();
+
+        for (String entry: entries) {
+            if (entry.startsWith(start)) {
+                itemStrings.add(entry);
+            }
+        }
+
+        return itemStrings;
     }
 
 }

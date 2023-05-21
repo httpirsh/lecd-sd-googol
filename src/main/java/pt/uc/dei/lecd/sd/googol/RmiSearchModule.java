@@ -30,7 +30,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	private final String name;
 	List<String> searchLogs = new ArrayList<>();
 	private InterfaceBarrel barrel;
-	private Queue queue;
+	private RemoteQueue queue;
 	private static final long serialVersionUID = 1L;
 	private final ArrayList<String> connected;
 
@@ -194,7 +194,7 @@ public class RmiSearchModule extends UnicastRemoteObject implements InterfaceSea
 	public boolean connectToQueue(String url) {
 		log.info("SearchModule {} connecting to {}", name, url);
         try {
-            this.queue = (Queue) Naming.lookup(url);
+            this.queue = (RemoteQueue) Naming.lookup(url);
 			this.connected.add(queue.toString());
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {

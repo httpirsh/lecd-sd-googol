@@ -145,7 +145,7 @@
                             <finalName>barrel</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>pt.uc.dei.lecd.sd.googol.IndexStorageBarrel</mainClass>
+                                    <mainClass>pt.uc.dei.lecd.sd.googol.Barrel</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.MalformedURLException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -54,16 +55,17 @@ public class DownloadersTest {
      * O nome do downloader é automaticamente construído com o prefixo "downloader_" seguido do número sequencial.
      * 
      * @throws RemoteException quando ocorrem erros de rmi
+     * @throws AlreadyBoundException
      */
     @Test
-    void shouldHaveProperNameAfterConnect() throws RemoteException {
+    void shouldHaveProperNameAfterConnect() throws RemoteException, AlreadyBoundException {
         String host = "localhost";
         int port = 1090;
         Downloader downloader = new Downloader();
         downloader.connect(host, port);
 
-        RegistryEntries entries = new RegistryEntries(registry.list());
+        GoogolRegistry entries = new GoogolRegistry(registry.list());
 
-        assertTrue(entries.getListOfDownloaders().contains("/googol/downloaders/downloader_1"));
+        assertTrue(entries.getListOfDownloaders().contains("googol/downloaders/downloader_1"));
     }
 }

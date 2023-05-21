@@ -2,22 +2,15 @@ package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NoSuchObjectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.function.BooleanSupplier;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 /**
  * A classe IndexStorageBarrel é responsável por armazenar informações sobre páginas web,
@@ -44,6 +37,7 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
 
     private final Map<String, Integer> termCounts;
     private final ArrayList<String> callbacks;
+    private GoogolRegistry registry;
 
     /**
      * Construtor da classe que inicializa os atributos da classe
@@ -232,18 +226,11 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
         return this.callbacks.toString();
     }
 
-    public boolean start(String host, int port, String app) {
+    public boolean start(String host, int port) {
         try {
-
-            Registry reg = LocateRegistry.getRegistry(host, port);
-
-            RegistryEntries entries = new RegistryEntries(reg.list());
-            name = entries.getNextBarrelName();
-            String path = app + "/barrels/" + name;
-            log.info("Starting {} at rmi://{}:{}/{}", name, host, port, path);
-
-            reg.bind(path, this);
-
+            log.info("Starting barrel at rmi://{}:{}/{}", host, port, name);
+            registry = new GoogolRegistry(host, port);
+            registry.bind(this);
             return true;
         } catch (RemoteException | AlreadyBoundException e) {
             log.error("Error starting {} object.", name, e);
@@ -251,13 +238,18 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
         } 
     }
 
-    public boolean stop() {
+    public boolean stop() throws AccessException, RemoteException, NotBoundException {
         try {
-            return unexportObject(this, false);
+            log.info("Stopping barrel {}", name);
+            return registry.unbind(this);
         } catch (NoSuchObjectException e) {
             log.error("Error stopping object {}", name, e);
             return false;
         }
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static void main(String[] args) throws RemoteException {
@@ -266,20 +258,21 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
         int port = arguments.getPort();
 
         try {
-            Downloader downloader = new Downloader();
-            downloader.connect(host, port);
-            downloader.start();
-            System.out.println("Googol downloader started with name " + downloader.getName());
+            Barrel barrel = new Barrel();
+            barrel.start(host, port);
+            System.out.println("Googol barrel started with name " + barrel.getName());
             Scanner scanner = new Scanner(System.in);
-            System.out.print("Press any key to stop downloader...");
+            System.out.print("Press any key to stop barrel...");
             scanner.nextLine();
             scanner.close();
-            downloader.stop();
+            barrel.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
 	}
 
-   
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

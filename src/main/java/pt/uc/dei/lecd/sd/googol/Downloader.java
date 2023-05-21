@@ -2,6 +2,7 @@ package pt.uc.dei.lecd.sd.googol;
 
 import java.net.MalformedURLException;
 import java.rmi.AccessException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -14,13 +15,6 @@ import java.util.StringTokenizer;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -132,8 +126,8 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
         this.running = false;
         log.info("Downloader " + getName() + " stopping... waiting for processing thread to finish.");
         processingThread.join();
-        registry.unbind("/googol/downloaders/" + getName());
-        UnicastRemoteObject.unexportObject(this, true);
+        registry.unbind(getName());
+        UnicastRemoteObject.unexportObject(this, false);
         log.info("Downloader " + getName() + " stopped.");
     }
 
@@ -176,17 +170,18 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
      * @param host  A máquina onde está o registo
      * @param port  O porto onde está o registo na máquina
      * @throws RemoteException  Em caso de erro de ligação
+     * @throws AlreadyBoundException
      */
-    public void connect(String host, int port) throws RemoteException {
+    public void connect(String host, int port) throws RemoteException, AlreadyBoundException {
         registry = LocateRegistry.getRegistry(host, port);
 
-        RegistryEntries entries = new RegistryEntries(registry.list());
+        GoogolRegistry entries = new GoogolRegistry(registry.list());
         this.name = entries.getNextDownloaderName();
 
-        registry.rebind("/googol/downloaders/" + name, this);
+        registry.bind(name, this);
         
-        connectToQueue(RegistryEntries.getQueueUri(host, port));
-        connectToBarrel(RegistryEntries.getBarrelUri(host, port));
+        connectToQueue(GoogolRegistry.getQueueUri(host, port));
+        connectToBarrel(GoogolRegistry.getBarrelUri(host, port));
     }
 
     public String getName() {

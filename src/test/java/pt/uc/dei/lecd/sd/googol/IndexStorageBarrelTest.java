@@ -2,6 +2,7 @@ package pt.uc.dei.lecd.sd.googol;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 
@@ -19,13 +20,13 @@ public class IndexStorageBarrelTest {
     }
     
     @Test
-    void Should_True_When_StartedAndStoppedMultipleBarrels() throws RemoteException {
+    void Should_True_When_StartedAndStoppedMultipleBarrels() throws RemoteException, NotBoundException {
 
         Barrel barrel1 = new Barrel();
-        assertTrue(barrel1.start("localhost", port, "/googol"));
+        assertTrue(barrel1.start("localhost", port));
 
         Barrel barrel2 = new Barrel();
-        assertTrue(barrel2.start("localhost", port, "/googol"));
+        assertTrue(barrel2.start("localhost", port));
 
         assertTrue(barrel1.stop());
 

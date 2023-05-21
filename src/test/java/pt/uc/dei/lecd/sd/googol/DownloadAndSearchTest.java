@@ -69,10 +69,9 @@ public class DownloadAndSearchTest {
      */
     @Test
     void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException {
-        RMIQueue queue = new RMIQueue();
-        registry.bind("DownloadAndSearchTest/queue", queue);
+        RemoteQueue queue = new RemoteQueue();
+        queue.start("localhost", 1090);
         downloader.connect("localhost", 1090);
-        downloader.connectToQueue("//localhost:1090/DownloadAndSearchTest/queue");
 
         queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
 

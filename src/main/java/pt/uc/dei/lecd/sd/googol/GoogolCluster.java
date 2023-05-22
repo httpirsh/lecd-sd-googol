@@ -51,8 +51,7 @@ public class GoogolCluster {
         downloader1.connectToBarrel("rmi://localhost/googol/barrels/barrel_1");
         downloader1.connectToQueue("rmi://localhost/googol/queue");
         downloader1.start();
-        search.connectToBarrel("rmi://localhost/googol/barrels/barrel_1");
-        search.connectToQueue("rmi://localhost/googol/queue");
+        search.start("localhost", port);
     }
     public static void main(String[] args) {
         System.out.println("Googol cluster.... initialising.");

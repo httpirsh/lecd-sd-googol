@@ -3,7 +3,6 @@ package pt.uc.dei.lecd.sd.googol;
 import java.net.MalformedURLException;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
 import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -30,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 public class Search extends UnicastRemoteObject implements InterfaceSearchModule {
 
 	List<String> searchLogs = new ArrayList<>();
-	private InterfaceBarrel barrel;
-	private RemoteQueue queue;
 	private static final long serialVersionUID = 1L;
 	private final ArrayList<String> connected;
 	private GoogolRegistry registry;
@@ -53,10 +50,6 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	public Search() throws MalformedURLException, NotBoundException, RemoteException {
 		this.connected = new ArrayList<>();
 	}
-	public void connectToBarrel(String url) throws MalformedURLException, NotBoundException, RemoteException {
-		this.barrel = (InterfaceBarrel) Naming.lookup(url);
-		this.connected.add(this.barrel.toString());
-	}
 
 	/**
 	 * O método searchResults tem como objetivo obter os resultados de uma pesquisa a partir dos
@@ -70,27 +63,34 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * conteúdo da página. Cada página de resultados é exibida em grupos de 10, utilizando um
 	 * separador que indica o início de uma nova página de resultados.
 	 */
-
 	public List<String> searchResults(String terms) throws RemoteException {
-		searchLogs.add(terms);
-		HashSet<String> urls = barrel.searchTerms(terms);
-		List<String> results = new ArrayList<>();
+		InterfaceBarrel barrel;
+		try {
+			barrel = registry.getBarrelInRoundRobin();
+		
+			searchLogs.add(terms);
+			HashSet<String> urls = barrel.searchTerms(terms);
+			List<String> results = new ArrayList<>();
 
-		if (urls == null) {
-			results.add("Não existem páginas que contenham esses termos");
-		} else {
-			int i = 0;
-			for (String url : urls) {
-				if (i % 10 == 0) {
-					results.add("\n-------- Página " + (i / 10 + 1) + " --------\n");
+			if (urls == null) {
+				results.add("Não existem páginas que contenham esses termos");
+			} else {
+				int i = 0;
+				for (String url : urls) {
+					if (i % 10 == 0) {
+						results.add("\n-------- Página " + (i / 10 + 1) + " --------\n");
+					}
+					results.add(barrel.getPageTitle(url));
+					results.add(url);
+					results.add(barrel.getShortQuote(url));
+					i++;
 				}
-				results.add(barrel.getPageTitle(url));
-				results.add(url);
-				results.add(barrel.getShortQuote(url));
-				i++;
 			}
+			return results;
+		} catch (MalformedURLException | NotBoundException e) {
+			log.error("Unable to search due to error getting a barrel.", e);
+			throw new RemoteException("Unable to search due to error getting a barrel.", e);
 		}
-		return results;
 	}
 
 	/**
@@ -107,9 +107,10 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * RemoteException.
 	 */
 	public void indexNewURL(String url) throws RemoteException {
-		if (this.queue != null) {
-			this.queue.enqueue(url);
-			log.info("index url {}", url);
+		Queue queue = registry.getQueue();
+		if (queue != null) {
+			queue.enqueue(url);
+			log.info("Index url {}", url);
 		} else {
 			log.warn("Not connected to queue. Index request for {} was ignored.", url);
 		}
@@ -159,43 +160,12 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 		return topTerms;
 	}
 
-	public boolean connectToQueue(String url) {
-		log.info("Search connecting to {}", url);
-        try {
-            this.queue = (RemoteQueue) Naming.lookup(url);
-			this.connected.add(queue.toString());
-            return true;
-        } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            log.error("Failed while connecting search to {}", url, e);
-            return false;
-        }
-	}
-
 	@Override
 	public String getConnected() throws RemoteException {
-		String callbacks = this.barrel.getCallbacks();
 		String connected = this.connected.toString();
-		return callbacks.concat(connected);
+		return connected;
 	}
-
-	public static void main(String[] args) throws RemoteException {
-		ArgumentsProcessor arguments = new ArgumentsProcessor(args);
-        String host = arguments.getHost();
-        int port = arguments.getPort();
-
-        try {
-            Search search = new Search();
-            search.start(host, port);
-            System.out.println("Googol search started.");
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("Press any key to stop search...");
-            scanner.nextLine();
-            scanner.close();
-            search.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-	}
+	
     public boolean start(String host, int port) {
         try {
             log.info("Starting search at rmi://{}:{}/{}", host, port);
@@ -218,8 +188,24 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
         }
     }
 
-	InterfaceBarrel getBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
-		return registry.getBarrelInRoundRobin();
+	public static void main(String[] args) throws RemoteException {
+		ArgumentsProcessor arguments = new ArgumentsProcessor(args);
+        String host = arguments.getHost();
+        int port = arguments.getPort();
+
+        try {
+            System.out.println("Googol search module starting with registry at rmi://" + host + ":" + port);
+            Search search = new Search();
+            search.start(host, port);
+            System.out.println("Googol search module started.");
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Press any key to stop search...");
+            scanner.nextLine();
+            scanner.close();
+            search.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 
 }

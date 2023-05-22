@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.util.List;
 
 /**
@@ -17,21 +16,18 @@ import java.util.List;
 @Slf4j
 public class SearchModuleTests {
 
-    private static Downloader downloader;
-    private static Search searchModule;
-    private static Registry registry;
+    private static Search victim;
+    private static int port = 1090;
 
     @BeforeAll
     static void init() throws RemoteException, MalformedURLException, NotBoundException, AlreadyBoundException {
-        registry = TestUtils.getRegistryInstance(1090);
+        TestUtils.startLocalRegistry(port);;
 
-        registry.bind("SearchModuleTests/barrels/barrel_1", new Barrel());
+        Barrel barrel = new Barrel();
+        barrel.start("localhost", port);;
 
-        downloader = new Downloader();
-        downloader.connectToBarrel("//localhost:1090/SearchModuleTests/barrels/barrel_1");
-
-        searchModule = new Search();
-        searchModule.connectToBarrel("//localhost:1090/SearchModuleTests/barrels/barrel_1");
+        victim = new Search();
+        victim.start("localhost", port);;
     }
 
     /**
@@ -43,13 +39,13 @@ public class SearchModuleTests {
     void Should_return_top10_After_many_searches() throws RemoteException {
         // Fazer 20 pesquisas
         for (int i = 1; i <= 20; i++) {
-            searchModule.searchResults(Integer.toString(i));
+            victim.searchResults(Integer.toString(i));
             if (i % 2 == 0) { // Se for par, pesquisa outra vez para ficar no top
-                searchModule.searchResults(Integer.toString(i));
+                victim.searchResults(Integer.toString(i));
             }
         }
 
-        List<String> topSearches = searchModule.getTopSearches(10);
+        List<String> topSearches = victim.getTopSearches(10);
         log.info("SearchModule getTopSearches returned {}", topSearches);
 
         assertAll("Os mais pesquisados devem ser os pares.",
@@ -75,7 +71,20 @@ public class SearchModuleTests {
             () -> assertFalse(topSearches.contains("15")),
             () -> assertFalse(topSearches.contains("17")),
             () -> assertFalse(topSearches.contains("19"))
-
         );
+    }
+
+    @Test
+    void shouldAddToQueueWhenIndexUrlCalled() throws AlreadyBoundException, RemoteException, NotBoundException {
+        RemoteQueue queue = new RemoteQueue();
+        queue.start("localhost", port);
+
+        victim.indexNewURL("http://someurl");
+        assertEquals(1, queue.size());
+
+        victim.indexNewURL("http://someotherurl");
+        assertEquals(2, queue.size());
+
+        queue.stop();
     }
 }

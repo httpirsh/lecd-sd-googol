@@ -14,7 +14,7 @@ import java.rmi.registry.Registry;
  * Isso pode ajudar a reduzir a duplicação de código e a simplificar a implementação dos testes.
  */
 public class TestUtils {
-    static Registry getRegistryInstance(int port) throws RemoteException {
+    static Registry startLocalRegistry(int port) throws RemoteException {
         Registry registry;
         try {
             registry = LocateRegistry.createRegistry(port);

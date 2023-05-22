@@ -15,7 +15,7 @@ public class RemoteQueueTest {
 
     @BeforeAll
     static void init() throws RemoteException{
-        registry = TestUtils.getRegistryInstance(1090);
+        registry = TestUtils.startLocalRegistry(1090);
     }
 
 

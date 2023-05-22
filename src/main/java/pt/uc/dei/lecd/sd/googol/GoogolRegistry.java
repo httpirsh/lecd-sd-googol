@@ -14,9 +14,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Esta é uma classe utilitária para lidar com as entradas do registo.
  */
+@Slf4j
 public class GoogolRegistry {
 
     private List<String> entries;
@@ -87,7 +90,7 @@ public class GoogolRegistry {
     }
 
     public static String getBarrelUri(String name, String host, int port) {
-        return "rmi://" + host + ":" + port + "/googol/barrels/" + name;
+        return "rmi://" + host + ":" + port + "/" + name;
     }
 
     public String getNextBarrelName() {
@@ -179,5 +182,15 @@ public class GoogolRegistry {
         }
 
         return lastBarrelNameReturnedForRoundRobin;
+    }
+
+    public Queue getQueue() {
+        try {
+            updateEntries();
+            return (Queue) Naming.lookup(getQueueUri(host, port));
+        } catch (RemoteException | MalformedURLException | NotBoundException e) {
+            log.error("Couldn't connect to queue. Is there a queue running?", e);
+        }
+        return null;
     }
 }

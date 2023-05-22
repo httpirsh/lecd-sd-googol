@@ -3,15 +3,12 @@ package pt.uc.dei.lecd.sd.googol;
 import lombok.extern.slf4j.Slf4j;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.util.List;
 
 /**
@@ -23,16 +20,16 @@ import java.util.List;
 public class DownloadAndSearchTest {
 
     private static Search searchModule;
-    private static Registry registry;
+    private static final int port = 1090;
 
     @BeforeAll
     static void init() throws RemoteException, MalformedURLException, NotBoundException, AlreadyBoundException {
-        registry = TestUtils.getRegistryInstance(1090);
+        TestUtils.startLocalRegistry(port);
 
-        registry.bind("googol/barrels/barrel_1", new Barrel());
+        new Barrel().start("localhost", port);
 
         searchModule = new Search();
-        searchModule.connectToBarrel("//localhost:1090/googol/barrels/barrel_1");
+        searchModule.start("localhost", port);
     }
 
     /**
@@ -42,20 +39,25 @@ public class DownloadAndSearchTest {
      * e se o método searchResults() do objeto RmiSearchModule retorna uma lista não vazia de resultados para a consulta de pesquisa fornecida.
      *
      * @throws RemoteException
+     * @throws AlreadyBoundException
+     * @throws NotBoundException
+     * @throws InterruptedException
      */
     @Test
-    void Should_find_document_After_index() throws RemoteException {
+    void Should_find_document_After_index() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException {
 
-        Downloader victim = new Downloader();
-        victim.connectToBarrel("//localhost:1090/googol/barrels/barrel_1");
+        Downloader downloader = new Downloader();
+        downloader.connect("localhost", port);
+        downloader.start();
 
-        assertTrue(victim.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
+        assertTrue(downloader.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
 
         List<String> results = searchModule.searchResults("Stranger");
 
         log.debug("Received results for {} are {}", "Stranger", String.join(", ", results));
 
         assertTrue(results.size() > 0);
+        downloader.stop();
     }
 
     /**
@@ -76,7 +78,6 @@ public class DownloadAndSearchTest {
         queue.start("localhost", 1090);
         
         Downloader victim = new Downloader();
-        victim.connectToBarrel("//localhost:1090/googol/barrels/barrel_1");
         victim.connect("localhost", 1090);
         queue.enqueue("https://en.wikipedia.org/wiki/Prison_Break");
 

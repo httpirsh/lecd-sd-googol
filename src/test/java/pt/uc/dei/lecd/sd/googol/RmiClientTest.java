@@ -18,7 +18,7 @@ public class RmiClientTest {
 
     @BeforeAll
     static void init() throws RemoteException, MalformedURLException, NotBoundException {
-        Registry registry = TestUtils.getRegistryInstance(1090);
+        Registry registry = TestUtils.startLocalRegistry(1090);
         registry.rebind("googoltest/search", new Search());
         client = new RmiClient("testClient");
     }

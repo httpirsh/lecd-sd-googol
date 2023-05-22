@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test;
 
 public class IndexStorageBarrelTest {
 
-    private static Registry registry;
     private static final int port = 1090;
 
     @BeforeAll
     static void init() throws RemoteException{
-        registry = TestUtils.getRegistryInstance(port);
+        TestUtils.startLocalRegistry(port);
     }
     
     @Test

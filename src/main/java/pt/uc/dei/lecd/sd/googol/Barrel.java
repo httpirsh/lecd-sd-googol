@@ -75,6 +75,7 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
      * resultados da pesquisa realizada pelo usuário.
      */
     public void addPageTitle(String url, String title) {
+        log.info("addPageTitle title={} url={}", title, url);
     	pageTitles.put(url, title);
     }
 

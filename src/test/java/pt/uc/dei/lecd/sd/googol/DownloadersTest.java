@@ -13,6 +13,8 @@ import java.rmi.registry.Registry;
 
 public class DownloadersTest {
 
+    private static final String host = "localhost";
+    private static final int port = 1090;
     private static Downloader downloader;
     private static Registry registry;
 
@@ -23,15 +25,16 @@ public class DownloadersTest {
      * e utiliza-a para vincular um objeto IndexStorageBarrel com o nome "googoltest/barrels/barrel_1" ao registro RMI.
      * Em seguida, uma instância do objeto Downloader é criada e conectada ao índice previamente vinculado.
      * @throws RemoteException
+     * @throws AlreadyBoundException
      * @throws MalformedURLException
      * @throws NotBoundException
      */
     @BeforeAll
-    static void init() throws RemoteException{
-        registry = TestUtils.startLocalRegistry(1090);
+    static void init() throws RemoteException, AlreadyBoundException{
+        registry = TestUtils.startLocalRegistry(port);
         registry.rebind("googoltest/barrels/barrel_1", new Barrel());
         downloader = new Downloader();
-        downloader.connectToBarrel("//localhost:1090/googoltest/barrels/barrel_1");
+        downloader.connect(host, port);
     }
 
     /**
@@ -59,13 +62,11 @@ public class DownloadersTest {
      */
     @Test
     void shouldHaveProperNameAfterConnect() throws RemoteException, AlreadyBoundException {
-        String host = "localhost";
-        int port = 1090;
         Downloader downloader = new Downloader();
         downloader.connect(host, port);
 
         GoogolRegistry entries = new GoogolRegistry(registry.list());
 
-        assertTrue(entries.getListOfDownloaders().contains("googol/downloaders/downloader_1"));
+        assertTrue(entries.getListOfDownloaders().contains("googol/downloaders/downloader_2"));
     }
 }

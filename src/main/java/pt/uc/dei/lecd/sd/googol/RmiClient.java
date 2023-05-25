@@ -164,10 +164,19 @@ public class RmiClient {
 	}
 
 	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
-		log.info("Starting RMIClient...");
 		Scanner sc = new Scanner(System.in);
-		RmiClient client = new RmiClient("search");
-		client.connect("//localhost/SearchModule");
-		client.iniciar(sc);
+		ArgumentsProcessor arguments = new ArgumentsProcessor(args);
+        String host = arguments.getHost();
+        int port = arguments.getPort();
+
+        try {
+            System.out.println("Googol Client module starting with registry at rmi://" + host + ":" + port);
+			RmiClient client = new RmiClient("search");
+			client.connect("rmi://" + host + ":" + port + "/googol/search");
+			client.iniciar(sc);
+			sc.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 }

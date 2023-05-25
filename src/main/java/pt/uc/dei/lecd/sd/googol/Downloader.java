@@ -6,10 +6,9 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -37,28 +36,15 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
     private Queue queue;
     private boolean running;
     private Thread processingThread;
-    private Registry registry;
+    private GoogolRegistry registry;
+    private List<InterfaceBarrel> barrels;
 
     public Downloader() throws RemoteException {
         this.running = false;
     }
 
-    /**
-     * Connects to an Index Storage Barrel.
-     * @param url The url where the barrel is located
-     * @return true is the connection was successfull, false otherwise
-     * @throws RemoteException
-     */
-    public boolean connectToBarrel(String url) throws RemoteException {
-        log.info("Downloader {} connecting to {}", name, url);
-        try {
-            this.barrel = (InterfaceBarrel) Naming.lookup(url);
-            this.barrel.callback(this.toString());
-            return true;
-        } catch (NotBoundException | MalformedURLException | RemoteException e) {
-            log.error("Failed while connecting {} to {}", name, url, e);
-            return false;
-        }
+    private void updateBarrels() {
+        barrels = registry.getBarrels();
     }
 
     public boolean indexURL(String url) throws RemoteException {
@@ -76,23 +62,56 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
                 linkList.add(link.attr("abs:href"));
             }
 
+            updateBarrels();
+
             // dividir o texto em tokens individuais
-            StringTokenizer tokens = new StringTokenizer(text, " ,:/.?'_");
+            StringTokenizer tokens = new StringTokenizer(text, " ,:/.?'_");            
             while (tokens.hasMoreElements())
-                barrel.addToIndex(tokens.nextToken().toLowerCase(), url); // Adicionar a palavra ao índice invertido
+                addToBarrelsIndex(tokens.nextToken().toLowerCase(), url); // Adicionar a palavra ao índice invertido
 
             for (String link : linkList) {
                 enqueue(link); // Adicionar link à queue para indexar recursivamente
-                barrel.urlConnections(link); // Atualizar o número de ligações da página linkada
+                addToBarrelsUrlConnections(link); // Atualizar o número de ligações da página linkada
             }
 
-            barrel.addPageTitle(url, title); // Adicionar o título da página ao índice
-            barrel.addPageContents(url, text); // Adicionar o texto da página ao índice
-            barrel.addPageLinks(url, linkList); // Adicionar os links encontrados na página ao índice
+            addToBarrelsPageInfo(url, title, text, linkList);
+
             return true;
         } catch (Exception e) {
             log.error("Unable to index url {} to barrel", url, e);
             return false;
+        }
+    }
+
+    private void addToBarrelsUrlConnections(String link) {
+        for (InterfaceBarrel barrel: barrels) {
+            try {
+                barrel.urlConnections(link);
+            } catch (RemoteException e) {
+                log.error("Error calling barrel.", e);
+            }
+        }        
+    }
+
+    private void addToBarrelsIndex(String term, String url) {
+        for (InterfaceBarrel barrel: barrels) {
+            try {
+                barrel.addToIndex(term, url);
+            } catch (RemoteException e) {
+                log.error("Error calling barrel.", e);
+            }
+        }
+    }
+
+    private void addToBarrelsPageInfo(String url, String title, String text, ArrayList<String> linkList) {
+        for (InterfaceBarrel barrel: barrels) {
+            try {
+                barrel.addPageTitle(url, title); // Adicionar o título da página ao índice
+                barrel.addPageContents(url, text); // Adicionar o texto da página ao índice
+                barrel.addPageLinks(url, linkList); // Adicionar os links encontrados na página ao índice    
+            } catch (RemoteException e) {
+                log.error("Error calling barrel.", e);
+            }
         }
     }
 
@@ -126,8 +145,7 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
         this.running = false;
         log.info("Downloader " + getName() + " stopping... waiting for processing thread to finish.");
         processingThread.join();
-        registry.unbind(getName());
-        UnicastRemoteObject.unexportObject(this, false);
+        registry.unbind(this);
         log.info("Downloader " + getName() + " stopped.");
     }
 
@@ -173,15 +191,12 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
      * @throws AlreadyBoundException
      */
     public void connect(String host, int port) throws RemoteException, AlreadyBoundException {
-        registry = LocateRegistry.getRegistry(host, port);
+        registry = new GoogolRegistry(host, port);
+        this.name = registry.getNextDownloaderName();
 
-        GoogolRegistry entries = new GoogolRegistry(registry.list());
-        this.name = entries.getNextDownloaderName();
-
-        registry.bind(name, this);
+        registry.bind(this);
         
         connectToQueue(GoogolRegistry.getQueueUri(host, port));
-        connectToBarrel(GoogolRegistry.getBarrelUri("googol/barrels/barrel_1", host, port));
     }
 
     public String getName() {

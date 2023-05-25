@@ -48,7 +48,6 @@ public class GoogolCluster {
         registry.rebind("googol/queue", queue);
         log.info("Queue {} bound at {}", "queue", "googol/queue");
 
-        downloader1.connectToBarrel("rmi://localhost/googol/barrels/barrel_1");
         downloader1.connectToQueue("rmi://localhost/googol/queue");
         downloader1.start();
         search.start("localhost", port);

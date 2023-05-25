@@ -151,6 +151,22 @@
                             </archive>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>make-client</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>client</classifier>
+                            <finalName>client</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>pt.uc.dei.lecd.sd.googol.RmiClient</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

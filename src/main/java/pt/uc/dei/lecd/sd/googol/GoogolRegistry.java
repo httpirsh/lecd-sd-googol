@@ -122,39 +122,48 @@ public class GoogolRegistry {
         return itemStrings;
     }
 
-    public void bind(Barrel barrel) throws AccessException, RemoteException, AlreadyBoundException {
-        updateEntries();
-        barrel.setName(getNextBarrelName());
-        registry.bind(barrel.getName(), barrel);
-    }
-
     private void updateEntries() throws AccessException, RemoteException {
         if (registry != null) {
             this.entries = Arrays.asList(registry.list());
         }
     }
 
-    public boolean unbind(Barrel barrel) throws AccessException, RemoteException, NotBoundException {
-        registry.unbind(barrel.getName());
-        return UnicastRemoteObject.unexportObject(barrel, false);
-    }
-
-    public void bind(RemoteQueue queue) throws AccessException, RemoteException, AlreadyBoundException {
-        registry.bind("googol/queue", queue);
-    }
-
-    public boolean unbind(RemoteQueue remoteQueue) throws AccessException, RemoteException, NotBoundException {
-        registry.unbind("googol/queue");
-        return UnicastRemoteObject.unexportObject(remoteQueue, false);
+    public void bind(Barrel barrel) throws AccessException, RemoteException, AlreadyBoundException {
+        updateEntries();
+        barrel.setName(getNextBarrelName());
+        registry.bind(barrel.getName(), barrel);
     }
 
     public void bind(Search search) throws AccessException, RemoteException, AlreadyBoundException {
         registry.bind("googol/search", search);
     }
 
+    public void bind(Downloader downloader) throws AccessException, RemoteException, AlreadyBoundException {
+        registry.bind(downloader.getName(), downloader);
+    }
+
+    public void bind(RemoteQueue queue) throws AccessException, RemoteException, AlreadyBoundException {
+        registry.bind("googol/queue", queue);
+    }
+ 
+    public boolean unbind(Barrel barrel) throws AccessException, RemoteException, NotBoundException {
+        registry.unbind(barrel.getName());
+        return UnicastRemoteObject.unexportObject(barrel, false);
+    }
+
     public boolean unbind(Search search) throws AccessException, RemoteException, NotBoundException {
         registry.unbind("googol/search");
         return UnicastRemoteObject.unexportObject(search, false);
+    }
+
+    public boolean unbind(Downloader downloader) throws AccessException, RemoteException, NotBoundException {
+        registry.unbind(downloader.getName());
+        return UnicastRemoteObject.unexportObject(downloader, false);
+    }
+
+    public boolean unbind(RemoteQueue remoteQueue) throws AccessException, RemoteException, NotBoundException {
+        registry.unbind("googol/queue");
+        return UnicastRemoteObject.unexportObject(remoteQueue, false);
     }
 
     public InterfaceBarrel getBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
@@ -193,4 +202,22 @@ public class GoogolRegistry {
         }
         return null;
     }
+
+    public List<InterfaceBarrel> getBarrels() {
+        ArrayList<InterfaceBarrel> barrels = new ArrayList<>();
+        List<String> barrelNames = getListOfBarrels();
+
+        for (String barrelName: barrelNames) {
+            InterfaceBarrel barrel;
+            try {
+                barrel = (InterfaceBarrel) Naming.lookup(getBarrelUri(barrelName, host, port));
+                barrels.add(barrel);
+            } catch (MalformedURLException | RemoteException | NotBoundException e) {
+                log.error("Error when looking up for barrel {}", barrelName, e);
+            }
+        }
+
+        return barrels;
+    }
+    
 }

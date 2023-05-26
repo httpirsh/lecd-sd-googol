@@ -30,7 +30,7 @@ public class RemoteQueueTest {
     void shouldHaveProperNameAfterConnect() throws RemoteException, AlreadyBoundException, NotBoundException {
         String host = "localhost";
         int port = 1090;
-        RemoteQueue queue = new RemoteQueue();
+        Queue queue = new Queue();
         queue.start(host, port);
 
         GoogolRegistry entries = new GoogolRegistry(registry.list());

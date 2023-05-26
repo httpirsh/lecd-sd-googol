@@ -34,7 +34,6 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
     private final HashMap<String, Integer> pageLinkCounts; // mapa de contagem de links de cada página, com a URL como chave e o número de links como valor
 
     private final Map<String, Integer> termCounts;
-    private final ArrayList<String> callbacks;
     private GoogolRegistry registry;
 
     /**
@@ -47,7 +46,6 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
         this.pageLinks = new HashMap<>();
         this.pageLinkCounts = new HashMap<>();
         this.termCounts = new HashMap<>();
-        this.callbacks = new ArrayList<>();
     }
 
     /**
@@ -213,16 +211,6 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
     public String ping() {
         log.info("ping was called, answering pong.");
         return "pong";
-    }
-
-    @Override
-    public void callback(String downloader) {
-        this.callbacks.add(downloader);
-    }
-
-    @Override
-    public String getCallbacks() throws RemoteException {
-        return this.callbacks.toString();
     }
 
     public boolean start(String host, int port) {

@@ -40,8 +40,5 @@ public interface InterfaceBarrel extends Remote {
 
 	String ping() throws RemoteException;
 
-    void callback(String string) throws RemoteException;
-
-    String getCallbacks() throws RemoteException;
 }
 

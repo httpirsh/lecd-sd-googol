@@ -47,9 +47,11 @@ public class DownloadersTest {
      * Se o teste passar, ele confirmará que a instância do objeto Downloader
      * está conectada corretamente ao índice e que é capaz de indexar documentos da web com sucesso.
      * @throws RemoteException
+     * @throws NotBoundException
+     * @throws MalformedURLException
      */
     @Test
-    void Should_return_true_When_downloader_indexURL() throws RemoteException {
+    void Should_return_true_When_downloader_indexURL() throws RemoteException, MalformedURLException, NotBoundException {
         assertTrue(downloader.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
     }
 

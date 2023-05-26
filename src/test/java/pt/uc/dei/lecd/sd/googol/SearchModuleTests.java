@@ -76,7 +76,7 @@ public class SearchModuleTests {
 
     @Test
     void shouldAddToQueueWhenIndexUrlCalled() throws AlreadyBoundException, RemoteException, NotBoundException {
-        RemoteQueue queue = new RemoteQueue();
+        Queue queue = new Queue();
         queue.start("localhost", port);
 
         victim.indexNewURL("http://someurl");

@@ -107,7 +107,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * RemoteException.
 	 */
 	public void indexNewURL(String url) throws RemoteException {
-		Queue queue = registry.getQueue();
+		InterfaceQueue queue = registry.getQueue();
 		if (queue != null) {
 			queue.enqueue(url);
 			log.info("Index url {}", url);

@@ -42,9 +42,10 @@ public class DownloadAndSearchTest {
      * @throws AlreadyBoundException
      * @throws NotBoundException
      * @throws InterruptedException
+     * @throws MalformedURLException
      */
     @Test
-    void Should_find_document_After_index() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException {
+    void Should_find_document_After_index() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException, MalformedURLException {
 
         Downloader downloader = new Downloader();
         downloader.connect("localhost", port);
@@ -74,7 +75,7 @@ public class DownloadAndSearchTest {
      */
     @Test
     void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException {
-        RemoteQueue queue = new RemoteQueue();
+        Queue queue = new Queue();
         queue.start("localhost", 1090);
         
         Downloader victim = new Downloader();

@@ -28,7 +28,7 @@ public class GoogolCluster {
 
         Downloader downloader1 = new Downloader();
         Downloader downloader2 = new Downloader();
-        RemoteQueue queue = new RemoteQueue();
+        Queue queue = new Queue();
 
         registry.rebind("googol/search", search);
         log.info("RmiSearchModule {} bound at {}", "search", "googol/search");

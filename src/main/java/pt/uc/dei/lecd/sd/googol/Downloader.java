@@ -32,8 +32,7 @@ import org.jsoup.select.Elements;
 public class Downloader extends UnicastRemoteObject implements Runnable {
 
     private String name;
-    private InterfaceBarrel barrel;
-    private Queue queue;
+    private InterfaceQueue queue;
     private boolean running;
     private Thread processingThread;
     private GoogolRegistry registry;
@@ -47,7 +46,10 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
         barrels = registry.getBarrels();
     }
 
-    public boolean indexURL(String url) throws RemoteException {
+    public boolean indexURL(String url) throws RemoteException, MalformedURLException, NotBoundException {
+        // notify the admin console that this downloader will download url
+        registry.notifyAdmin(this, url);
+        
         // download da página Web
         Document doc = null;
         try {
@@ -126,7 +128,7 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
     public boolean connectToQueue(String url) {
         log.info("Downloader {} connecting to {}", name, url);
         try {
-            this.queue = (Queue) Naming.lookup(url);
+            this.queue = (InterfaceQueue) Naming.lookup(url);
             return true;
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             log.error("Failed while connecting {} to {}", name, url, e);
@@ -173,7 +175,7 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
                     log.info("Downloader {} indexing url {}", this.name, url);
                     indexURL(url);
                 }
-            } catch (RemoteException e) {
+            } catch (RemoteException | MalformedURLException | NotBoundException e) {
                 log.error("Error in downloader {} while trying to dequeue", this.name, e);
             } catch (InterruptedException e) {
                 // carry on

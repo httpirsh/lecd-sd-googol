@@ -142,8 +142,12 @@ public class GoogolRegistry {
         registry.bind(downloader.getName(), downloader);
     }
 
-    public void bind(RemoteQueue queue) throws AccessException, RemoteException, AlreadyBoundException {
+    public void bind(Queue queue) throws AccessException, RemoteException, AlreadyBoundException {
         registry.bind("googol/queue", queue);
+    }
+
+    public void bind(AdminConsole adminConsole) throws AccessException, RemoteException, AlreadyBoundException {
+        registry.bind("googol/admin", adminConsole);
     }
  
     public boolean unbind(Barrel barrel) throws AccessException, RemoteException, NotBoundException {
@@ -161,7 +165,7 @@ public class GoogolRegistry {
         return UnicastRemoteObject.unexportObject(downloader, false);
     }
 
-    public boolean unbind(RemoteQueue remoteQueue) throws AccessException, RemoteException, NotBoundException {
+    public boolean unbind(Queue remoteQueue) throws AccessException, RemoteException, NotBoundException {
         registry.unbind("googol/queue");
         return UnicastRemoteObject.unexportObject(remoteQueue, false);
     }
@@ -193,10 +197,10 @@ public class GoogolRegistry {
         return lastBarrelNameReturnedForRoundRobin;
     }
 
-    public Queue getQueue() {
+    public InterfaceQueue getQueue() {
         try {
             updateEntries();
-            return (Queue) Naming.lookup(getQueueUri(host, port));
+            return (InterfaceQueue) Naming.lookup(getQueueUri(host, port));
         } catch (RemoteException | MalformedURLException | NotBoundException e) {
             log.error("Couldn't connect to queue. Is there a queue running?", e);
         }
@@ -219,5 +223,27 @@ public class GoogolRegistry {
 
         return barrels;
     }
+
+    public void notifyAdmin(Downloader downloader, String url) throws RemoteException, MalformedURLException, NotBoundException {
+        if (adminConsoleExists()) {
+            InterfaceAdminConsole admin = getAdminConsole();
+            admin.onDownloaderIndex(downloader.getName(), url);    
+        }
+    }
+
+    private InterfaceAdminConsole getAdminConsole() throws MalformedURLException, RemoteException, NotBoundException {
+        return (InterfaceAdminConsole) Naming.lookup(getAdminUri());
+    }
+
+    private String getAdminUri() {
+        return "rmi://" + host + ":" + port + "/googol/admin";
+    }
+
+    private boolean adminConsoleExists() throws AccessException, RemoteException {
+        updateEntries();
+        return entries.contains("googol/admin");
+    }
+
+
     
 }

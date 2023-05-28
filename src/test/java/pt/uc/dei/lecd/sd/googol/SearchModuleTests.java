@@ -8,7 +8,7 @@ import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Esta é uma classe de teste JUnit chamada DownloadAndSearchTest que testa a funcionalidade de um mecanismo de busca.
@@ -39,13 +39,13 @@ public class SearchModuleTests {
     void Should_return_top10_After_many_searches() throws RemoteException {
         // Fazer 20 pesquisas
         for (int i = 1; i <= 20; i++) {
-            victim.searchResults(Integer.toString(i));
+            victim.search(Integer.toString(i));
             if (i % 2 == 0) { // Se for par, pesquisa outra vez para ficar no top
-                victim.searchResults(Integer.toString(i));
+                victim.search(Integer.toString(i));
             }
         }
 
-        List<String> topSearches = victim.getTopSearches(10);
+        Set<String> topSearches = victim.getTopSearches();
         log.info("SearchModule getTopSearches returned {}", topSearches);
 
         assertAll("Os mais pesquisados devem ser os pares.",

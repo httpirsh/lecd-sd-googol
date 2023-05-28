@@ -6,6 +6,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,16 +68,16 @@ public class RmiClient {
 					// Consultar os resultados da pesquisa
 					System.out.print("Digite os termos da pesquisa: ");
 					String termos = sc.nextLine();
-					List<String> pages = this.search.searchResults(termos);
+					List<String> pages = this.search.search(termos);
 					for (String page : pages) {
 						System.out.println(page);
 					}
 					break;
 
 				case 3:
-					// List<String> barrels_downloaders_ativos
+					// Set<String> barrels_downloaders_ativos
 					// Mostrar top 10 de pesquisas
-					List<String> top10 = search.getTopSearches(10);
+					Set<String> top10 = search.getTopSearches();
 					System.out.println("As 10 pesquisas mais comuns.");
 					for (String search : top10) {
 						System.out.println(search);

@@ -28,10 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Search extends UnicastRemoteObject implements InterfaceSearchModule {
 
-	List<String> searchLogs = new ArrayList<>();
+	private final List<String> searchLogs;
 	private static final long serialVersionUID = 1L;
 	private final ArrayList<String> connected;
 	private GoogolRegistry registry;
+	private final Set<String> topSearches;
 
 	/**
 	 * O método main da classe tem a responsabilidade de iniciar o RMI Search Module, que permite
@@ -49,10 +50,12 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 */
 	public Search() throws MalformedURLException, NotBoundException, RemoteException {
 		this.connected = new ArrayList<>();
+		this.searchLogs = new ArrayList<>();
+		this.topSearches = new HashSet<>();
 	}
 
 	/**
-	 * O método searchResults tem como objetivo obter os resultados de uma pesquisa a partir dos
+	 * O método search tem como objetivo obter os resultados de uma pesquisa a partir dos
 	 * termos passados como argumento. Para isso, ele invoca o método "searchTerms" da instância
 	 * de "InterfaceBarrel" com o objetivo de obter um conjunto de URLs que correspondam aos termos
 	 * de pesquisa fornecidos. Caso a pesquisa não encontre nenhum resultado, o método exibe uma
@@ -63,12 +66,12 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * conteúdo da página. Cada página de resultados é exibida em grupos de 10, utilizando um
 	 * separador que indica o início de uma nova página de resultados.
 	 */
-	public List<String> searchResults(String terms) throws RemoteException {
+	public List<String> search(String terms) throws RemoteException {
 		InterfaceBarrel barrel;
 		try {
 			barrel = registry.getBarrelInRoundRobin();
 		
-			searchLogs.add(terms);
+			updateSearchLogs(terms);
 			HashSet<String> urls = barrel.searchTerms(terms);
 			List<String> results = new ArrayList<>();
 
@@ -90,6 +93,30 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 		} catch (MalformedURLException | NotBoundException e) {
 			log.error("Unable to search due to error getting a barrel.", e);
 			throw new RemoteException("Unable to search due to error getting a barrel.", e);
+		}
+	}
+
+	private void updateSearchLogs(String terms) throws MalformedURLException, RemoteException, NotBoundException {
+		searchLogs.add(terms);
+
+		// Get all search terms and their frequency
+		Map<String, Integer> termCounts = getTermCounts();
+
+		// Sort the terms by frequency in descending order
+		List<Map.Entry<String, Integer>> sortedTerms = new ArrayList<>(termCounts.entrySet());
+		sortedTerms.sort(Collections.reverseOrder(Map.Entry.comparingByValue()));
+
+		// Extract the top 10 terms (up to the limit) and return them as a list of strings
+		List<String> topTerms = new ArrayList<>();
+		for (int i = 0; i < 10 && i < sortedTerms.size(); i++) {
+			topTerms.add(sortedTerms.get(i).getKey());
+		}
+
+		boolean topSearchChanged = (this.topSearches.retainAll(topTerms) || this.topSearches.isEmpty());
+		this.topSearches.addAll(topTerms);
+
+		if (topSearchChanged) {
+			registry.topSearchChangedNotification(topSearches);
 		}
 	}
 
@@ -126,7 +153,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * separa as palavras de cada busca em termos, conta a frequência de cada termo e armazena essas contagens em um mapa.
 	 * O mapa resultante tem como chave o termo de busca e como valor a frequência do termo.
 	 */
-	private Map<String, Integer> getTermCounts() throws RemoteException {
+	private Map<String, Integer> getTermCounts() {
 		Map<String, Integer> termCounts = new HashMap<>();
 
 		// Iterate through each search log and count the frequency of each search term
@@ -140,24 +167,12 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	}
 
 	/**
-	 * O método getTopSearches(int limit) utiliza o método getTermCounts()
+	 * O método getTopSearches() utiliza o método getTermCounts()
 	 * para obter a contagem de frequência de cada termo de busca e, em seguida, classifica esses termos por ordem decrescente de frequência.
-	 * Depois extrai os N termos mais frequentes (com base no limite especificado) e retorna-os numa lista de strings.
+	 * Depois extrai os 10 termos mais frequentes e retorna-os numa lista de strings.
 	 */
-	public List<String> getTopSearches(int limit) throws RemoteException {
-		// Get all search terms and their frequency
-		Map<String, Integer> termCounts = getTermCounts();
-
-		// Sort the terms by frequency in descending order
-		List<Map.Entry<String, Integer>> sortedTerms = new ArrayList<>(termCounts.entrySet());
-		sortedTerms.sort(Collections.reverseOrder(Map.Entry.comparingByValue()));
-
-		// Extract the top N terms (up to the limit) and return them as a list of strings
-		List<String> topTerms = new ArrayList<>();
-		for (int i = 0; i < limit && i < sortedTerms.size(); i++) {
-			topTerms.add(sortedTerms.get(i).getKey());
-		}
-		return topTerms;
+	public Set<String> getTopSearches() throws RemoteException {
+		return this.topSearches;
 	}
 
 	@Override

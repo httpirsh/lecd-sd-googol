@@ -2,6 +2,7 @@ package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.util.Scanner;

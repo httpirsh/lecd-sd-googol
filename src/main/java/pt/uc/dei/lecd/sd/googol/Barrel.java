@@ -2,6 +2,7 @@ package pt.uc.dei.lecd.sd.googol;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.MalformedURLException;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NoSuchObjectException;
@@ -213,11 +214,12 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
         return "pong";
     }
 
-    public boolean start(String host, int port) {
+    public boolean start(String host, int port) throws MalformedURLException, NotBoundException {
         try {
             log.info("Starting barrel at rmi://{}:{}/{}", host, port, name);
             registry = new GoogolRegistry(host, port);
             registry.bind(this);
+            registry.barrelNotification(this.name); // notify the admin console that this downloader is active
             return true;
         } catch (RemoteException | AlreadyBoundException e) {
             log.error("Error starting {} object.", name, e);

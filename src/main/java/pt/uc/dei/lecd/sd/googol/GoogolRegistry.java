@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GoogolRegistry {
 
+    private static final String MONITOR_NAME = "googol/monitor";
+    private static final String QUEUE_NAME = "googol/queue";
     private List<String> entries;
     private Registry registry;
     private String lastBarrelNameReturnedForRoundRobin = null;
@@ -46,12 +49,21 @@ public class GoogolRegistry {
     }
 
     /**
-     * Devolve a lista de downloaders que estão no registry.
+     * Devolve a lista de nomes dos downloaders que estão no registry.
      * 
-     * @return a lista de downloaders.
+     * @return a lista de nomes dos downloaders.
      */
     public List<String> getListOfDownloaders() {
         return getListStartsWith("googol/downloaders/downloader_");
+    }
+
+     /**
+     * Devolve a lista de nomes dos barrels que estão no registry.
+     * 
+     * @return a lista de nomes dos barrels.
+     */
+    public List<String> getListOfBarrels() {
+        return getListStartsWith("googol/barrels/barrel_");
     }
 
     /**
@@ -82,11 +94,11 @@ public class GoogolRegistry {
      */
     public boolean hasQueue() throws AccessException, RemoteException {
         updateEntries();
-        return entries.contains("googol/queue");
+        return entries.contains(QUEUE_NAME);
     }
 
     public static String getQueueUri(String host, int port) {
-        return "rmi://" + host + ":" + port + "/googol/queue";
+        return "rmi://" + host + ":" + port + "/" + QUEUE_NAME;
     }
 
     public static String getBarrelUri(String name, String host, int port) {
@@ -104,10 +116,6 @@ public class GoogolRegistry {
         int number = Integer.parseInt(highest);
 
         return "googol/barrels/barrel_" + (number + 1);
-    }
-
-    private List<String> getListOfBarrels() {
-        return getListStartsWith("googol/barrels/barrel_");
     }
 
     private List<String> getListStartsWith(String start) {
@@ -143,11 +151,11 @@ public class GoogolRegistry {
     }
 
     public void bind(Queue queue) throws AccessException, RemoteException, AlreadyBoundException {
-        registry.bind("googol/queue", queue);
+        registry.bind(QUEUE_NAME, queue);
     }
 
-    public void bind(AdminConsole adminConsole) throws AccessException, RemoteException, AlreadyBoundException {
-        registry.bind("googol/admin", adminConsole);
+    public void bind(Monitor monitor) throws AccessException, RemoteException, AlreadyBoundException {
+        registry.bind(MONITOR_NAME, monitor);
     }
  
     public boolean unbind(Barrel barrel) throws AccessException, RemoteException, NotBoundException {
@@ -166,8 +174,13 @@ public class GoogolRegistry {
     }
 
     public boolean unbind(Queue remoteQueue) throws AccessException, RemoteException, NotBoundException {
-        registry.unbind("googol/queue");
+        registry.unbind(QUEUE_NAME);
         return UnicastRemoteObject.unexportObject(remoteQueue, false);
+    }
+
+    public boolean unbind(Monitor monitor) throws AccessException, RemoteException, NotBoundException {
+        registry.unbind(MONITOR_NAME);
+        return UnicastRemoteObject.unexportObject(monitor, false);
     }
 
     public InterfaceBarrel getBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
@@ -224,26 +237,38 @@ public class GoogolRegistry {
         return barrels;
     }
 
-    public void notifyAdmin(Downloader downloader, String url) throws RemoteException, MalformedURLException, NotBoundException {
+    public void downloaderNotification(String downloader) throws RemoteException, MalformedURLException, NotBoundException {
         if (adminConsoleExists()) {
             InterfaceAdminConsole admin = getAdminConsole();
-            admin.onDownloaderIndex(downloader.getName(), url);    
+            admin.downloaderNotification(downloader);    
+        }
+    }
+
+    public void barrelNotification(String name) throws AccessException, RemoteException, MalformedURLException, NotBoundException {
+        if (adminConsoleExists()) {
+            InterfaceAdminConsole admin = getAdminConsole();
+            admin.barrelNotification(name);
         }
     }
 
     private InterfaceAdminConsole getAdminConsole() throws MalformedURLException, RemoteException, NotBoundException {
-        return (InterfaceAdminConsole) Naming.lookup(getAdminUri());
+        return (InterfaceAdminConsole) Naming.lookup(getMonitorUri());
     }
 
-    private String getAdminUri() {
-        return "rmi://" + host + ":" + port + "/googol/admin";
+    private String getMonitorUri() {
+        return "rmi://" + host + ":" + port + "/" + MONITOR_NAME;
     }
 
     private boolean adminConsoleExists() throws AccessException, RemoteException {
         updateEntries();
-        return entries.contains("googol/admin");
+        return entries.contains(MONITOR_NAME);
     }
 
+    public void topSearchChangedNotification(Set<String> topSearches) throws MalformedURLException, RemoteException, NotBoundException {
+        if (adminConsoleExists()) {
+            InterfaceAdminConsole admin = getAdminConsole();
+            admin.topSearchChangedNotification(topSearches);
+        }
+    }
 
-    
 }

@@ -30,7 +30,7 @@ public class DownloadersTest {
      * @throws NotBoundException
      */
     @BeforeAll
-    static void init() throws RemoteException, AlreadyBoundException{
+    static void init() throws RemoteException, AlreadyBoundException, MalformedURLException, NotBoundException {
         registry = TestUtils.startLocalRegistry(port);
         registry.rebind("googoltest/barrels/barrel_1", new Barrel());
         downloader = new Downloader();
@@ -61,9 +61,11 @@ public class DownloadersTest {
      * 
      * @throws RemoteException quando ocorrem erros de rmi
      * @throws AlreadyBoundException
+     * @throws NotBoundException
+     * @throws MalformedURLException
      */
     @Test
-    void shouldHaveProperNameAfterConnect() throws RemoteException, AlreadyBoundException {
+    void shouldHaveProperNameAfterConnect() throws RemoteException, AlreadyBoundException, MalformedURLException, NotBoundException {
         Downloader downloader = new Downloader();
         downloader.connect(host, port);
 

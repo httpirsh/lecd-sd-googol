@@ -3,17 +3,18 @@ package pt.uc.dei.lecd.sd.googol;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Set;
 
 
 public interface InterfaceSearchModule extends Remote {
 	
-	List<String> searchResults(String terms) throws RemoteException;
+	List<String> search(String terms) throws RemoteException;
 	
 	void indexNewURL(String url)  throws RemoteException;
 	
 	String ping() throws RemoteException;
 
-	List<String> getTopSearches(int limit) throws RemoteException;
+	Set<String> getTopSearches() throws RemoteException;
 
     public String getConnected() throws RemoteException;
 }

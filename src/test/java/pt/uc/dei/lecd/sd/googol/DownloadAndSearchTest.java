@@ -53,7 +53,7 @@ public class DownloadAndSearchTest {
 
         assertTrue(downloader.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
 
-        List<String> results = searchModule.searchResults("Stranger");
+        List<String> results = searchModule.search("Stranger");
 
         log.debug("Received results for {} are {}", "Stranger", String.join(", ", results));
 
@@ -72,9 +72,10 @@ public class DownloadAndSearchTest {
      * @throws AlreadyBoundException
      * @throws InterruptedException
      * @throws NotBoundException
+     * @throws MalformedURLException
      */
     @Test
-    void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException {
+    void Should_increase_index_size_When_downloader_running_for_a_while() throws RemoteException, AlreadyBoundException, InterruptedException, NotBoundException, MalformedURLException {
         Queue queue = new Queue();
         queue.start("localhost", 1090);
         

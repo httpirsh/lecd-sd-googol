@@ -47,9 +47,6 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
     }
 
     public boolean indexURL(String url) throws RemoteException, MalformedURLException, NotBoundException {
-        // notify the admin console that this downloader will download url
-        registry.notifyAdmin(this, url);
-        
         // download da página Web
         Document doc = null;
         try {
@@ -146,7 +143,9 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
     public void stop() throws InterruptedException, AccessException, RemoteException, NotBoundException {
         this.running = false;
         log.info("Downloader " + getName() + " stopping... waiting for processing thread to finish.");
-        processingThread.join();
+        if (processingThread != null) {
+            processingThread.join();
+        }
         registry.unbind(this);
         log.info("Downloader " + getName() + " stopped.");
     }
@@ -191,14 +190,17 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
      * @param port  O porto onde está o registo na máquina
      * @throws RemoteException  Em caso de erro de ligação
      * @throws AlreadyBoundException
+     * @throws NotBoundException
+     * @throws MalformedURLException
      */
-    public void connect(String host, int port) throws RemoteException, AlreadyBoundException {
+    public void connect(String host, int port) throws RemoteException, AlreadyBoundException, MalformedURLException, NotBoundException {
         registry = new GoogolRegistry(host, port);
         this.name = registry.getNextDownloaderName();
 
         registry.bind(this);
         
         connectToQueue(GoogolRegistry.getQueueUri(host, port));
+        registry.downloaderNotification(this.name); // notify the admin console that this downloader is active
     }
 
     public String getName() {

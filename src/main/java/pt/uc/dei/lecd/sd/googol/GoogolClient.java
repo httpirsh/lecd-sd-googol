@@ -8,11 +8,19 @@ import java.util.Scanner;
 public class GoogolClient  {
     
     public static void main(String[] args) throws MalformedURLException, RemoteException, NotBoundException {
-        System.out.println("Googol Client.... a iniciar.");
-        Scanner sc = new Scanner(System.in);
-		RmiClient client = new RmiClient("search");
-		client.connect("//localhost/googol/search");
-	    System.out.println("Googol client iniciado com sucesso.");
-    	client.iniciar(sc);
+        ArgumentsProcessor arguments = new ArgumentsProcessor(args);
+        String host = arguments.getHost();
+        int port = arguments.getPort();
+
+        try {
+            System.out.println("Googol client starting with registry at rmi://" + host + ":" + port);
+            RmiClient client = new RmiClient("client");
+            client.connect(host, port);
+            System.out.println("Googol client started.");
+            Scanner scanner = new Scanner(System.in);
+            client.iniciar(scanner);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }    
 }

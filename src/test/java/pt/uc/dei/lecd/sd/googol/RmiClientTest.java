@@ -3,7 +3,6 @@ package pt.uc.dei.lecd.sd.googol;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,11 +14,14 @@ import org.junit.jupiter.api.Test;
  */
 public class RmiClientTest {
     private static RmiClient client;
+    private static final String host = "localhost";
+    private static final int port = 1090;
 
     @BeforeAll
     static void init() throws RemoteException, MalformedURLException, NotBoundException {
-        Registry registry = TestUtils.startLocalRegistry(1090);
-        registry.rebind("googoltest/search", new Search());
+        TestUtils.startLocalRegistry(1090);
+        Search search = new Search();
+        search.start(host, port);
         client = new RmiClient("testClient");
     }
 
@@ -33,7 +35,7 @@ public class RmiClientTest {
      */
     @Test
     void Should_connect_When_connect() throws MalformedURLException, NotBoundException, RemoteException {
-        client.connect("//localhost:1090/googoltest/search");
+        client.connect(host, port);
     }
 
     /**

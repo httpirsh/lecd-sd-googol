@@ -1,7 +1,6 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import java.net.MalformedURLException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -20,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RmiClient {
 	private final String name;
 	private InterfaceSearchModule search;
-
+	private GoogolRegistry registry;
 
 	public RmiClient(String name) {
 		this.name = name;
@@ -51,7 +50,7 @@ public class RmiClient {
 
 	public void iniciar(Scanner sc) throws RemoteException, NotBoundException, MalformedURLException {
 		int opcao;
-		boolean registoLogin = registoLogin(sc);
+		registoLogin(sc);
 		do {
 			menu();
 			opcao = validaInteiro(sc);
@@ -75,14 +74,23 @@ public class RmiClient {
 					break;
 
 				case 3:
-					// Set<String> barrels_downloaders_ativos
-					// Mostrar top 10 de pesquisas
 					Set<String> top10 = search.getTopSearches();
-					System.out.println("As 10 pesquisas mais comuns.");
+					System.out.println("O top de termos de pesquisa:");
 					for (String search : top10) {
 						System.out.println(search);
 					}
-					System.out.println("Os modulos conectados: " + this.search.getConnected());	
+
+					List<String> barrels = registry.getListOfBarrels();
+					System.out.println("Barrels activos:");
+					for (String barrel : barrels) {
+						System.out.println(barrel);
+					}
+
+					List<String> downloaders = registry.getListOfDownloaders();
+					System.out.println("Downloaders activos:");
+					for (String downloader : downloaders) {
+						System.out.println(downloader);
+					}
 					break;
 
 				case 4:
@@ -95,7 +103,6 @@ public class RmiClient {
 		} while (opcao != 4);
 	}
 
-    	
     	public static boolean registoLogin(Scanner sc) {
     	    boolean registo = false;
     	    boolean login = false;
@@ -159,9 +166,10 @@ public class RmiClient {
             return num;
         }
 
-	public void connect(String url) throws MalformedURLException, NotBoundException, RemoteException {
-		log.info("{} connecting with search module {}", name, url);
-		this.search = (InterfaceSearchModule) Naming.lookup(url);
+	public void connect(String host, int port) throws MalformedURLException, NotBoundException, RemoteException {
+		log.info("{} connecting with search module", name);
+		registry = new GoogolRegistry(host, port);
+		this.search = registry.lookupSearch();
 	}
 
 	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
@@ -173,7 +181,7 @@ public class RmiClient {
         try {
             System.out.println("Googol Client module starting with registry at rmi://" + host + ":" + port);
 			RmiClient client = new RmiClient("search");
-			client.connect("rmi://" + host + ":" + port + "/googol/search");
+			client.connect(host, port);
 			client.iniciar(sc);
 			sc.close();
         } catch (Exception e) {

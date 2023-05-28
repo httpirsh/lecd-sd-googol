@@ -30,7 +30,6 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 
 	private final List<String> searchLogs;
 	private static final long serialVersionUID = 1L;
-	private final ArrayList<String> connected;
 	private GoogolRegistry registry;
 	private final Set<String> topSearches;
 
@@ -49,7 +48,6 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * as tentativas falharem, uma mensagem de erro é exibida.
 	 */
 	public Search() throws MalformedURLException, NotBoundException, RemoteException {
-		this.connected = new ArrayList<>();
 		this.searchLogs = new ArrayList<>();
 		this.topSearches = new HashSet<>();
 	}
@@ -69,7 +67,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	public List<String> search(String terms) throws RemoteException {
 		InterfaceBarrel barrel;
 		try {
-			barrel = registry.getBarrelInRoundRobin();
+			barrel = registry.lookupBarrelInRoundRobin();
 		
 			updateSearchLogs(terms);
 			HashSet<String> urls = barrel.searchTerms(terms);
@@ -134,7 +132,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * RemoteException.
 	 */
 	public void indexNewURL(String url) throws RemoteException {
-		InterfaceQueue queue = registry.getQueue();
+		InterfaceQueue queue = registry.lookupQueue();
 		if (queue != null) {
 			queue.enqueue(url);
 			log.info("Index url {}", url);
@@ -175,12 +173,6 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 		return this.topSearches;
 	}
 
-	@Override
-	public String getConnected() throws RemoteException {
-		String connected = this.connected.toString();
-		return connected;
-	}
-	
     public boolean start(String host, int port) {
         try {
             log.info("Starting search at rmi://{}:{}/{}", host, port);

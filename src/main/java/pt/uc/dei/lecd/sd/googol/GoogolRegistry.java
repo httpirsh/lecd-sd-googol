@@ -25,6 +25,9 @@ public class GoogolRegistry {
 
     private static final String MONITOR_NAME = "googol/monitor";
     private static final String QUEUE_NAME = "googol/queue";
+    private static final String SEARCH_NAME = "googol/search";
+    private static final String DOWNLOADER_NAME_PREFIX = "googol/downloaders/downloader_";
+    private static final String BARREL_NAME_PREFIX = "googol/barrels/barrel_";
     private List<String> entries;
     private Registry registry;
     private String lastBarrelNameReturnedForRoundRobin = null;
@@ -54,7 +57,7 @@ public class GoogolRegistry {
      * @return a lista de nomes dos downloaders.
      */
     public List<String> getListOfDownloaders() {
-        return getListStartsWith("googol/downloaders/downloader_");
+        return getListStartsWith(DOWNLOADER_NAME_PREFIX);
     }
 
      /**
@@ -63,7 +66,7 @@ public class GoogolRegistry {
      * @return a lista de nomes dos barrels.
      */
     public List<String> getListOfBarrels() {
-        return getListStartsWith("googol/barrels/barrel_");
+        return getListStartsWith(BARREL_NAME_PREFIX);
     }
 
     /**
@@ -75,14 +78,14 @@ public class GoogolRegistry {
 
         List<String> downloaders = getListOfDownloaders();
         if (downloaders.isEmpty()) {
-            return "googol/downloaders/downloader_1";
+            return DOWNLOADER_NAME_PREFIX + "1";
         }
         
         Collections.sort(downloaders, Collections.reverseOrder());
         String highest = downloaders.get(0).split("_")[1];
         int number = Integer.parseInt(highest);
 
-        return "googol/downloaders/downloader_" + (number + 1);
+        return DOWNLOADER_NAME_PREFIX + (number + 1);
     }
 
     /**
@@ -108,14 +111,14 @@ public class GoogolRegistry {
     public String getNextBarrelName() {
         List<String> barrels = getListOfBarrels();
         if (barrels.isEmpty()) {
-            return "googol/barrels/barrel_1";
+            return BARREL_NAME_PREFIX + "1";
         }
         
         Collections.sort(barrels, Collections.reverseOrder());
         String highest = barrels.get(0).split("_")[1];
         int number = Integer.parseInt(highest);
 
-        return "googol/barrels/barrel_" + (number + 1);
+        return BARREL_NAME_PREFIX + (number + 1);
     }
 
     private List<String> getListStartsWith(String start) {
@@ -143,7 +146,7 @@ public class GoogolRegistry {
     }
 
     public void bind(Search search) throws AccessException, RemoteException, AlreadyBoundException {
-        registry.bind("googol/search", search);
+        registry.bind(SEARCH_NAME, search);
     }
 
     public void bind(Downloader downloader) throws AccessException, RemoteException, AlreadyBoundException {
@@ -164,7 +167,7 @@ public class GoogolRegistry {
     }
 
     public boolean unbind(Search search) throws AccessException, RemoteException, NotBoundException {
-        registry.unbind("googol/search");
+        registry.unbind(SEARCH_NAME);
         return UnicastRemoteObject.unexportObject(search, false);
     }
 
@@ -183,7 +186,7 @@ public class GoogolRegistry {
         return UnicastRemoteObject.unexportObject(monitor, false);
     }
 
-    public InterfaceBarrel getBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
+    public InterfaceBarrel lookupBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
         updateEntries();
         String barrelName = getNextBarrelNameInRoundRobin();
         return (InterfaceBarrel) Naming.lookup(getBarrelUri(barrelName, host, port));
@@ -210,7 +213,7 @@ public class GoogolRegistry {
         return lastBarrelNameReturnedForRoundRobin;
     }
 
-    public InterfaceQueue getQueue() {
+    public InterfaceQueue lookupQueue() {
         try {
             updateEntries();
             return (InterfaceQueue) Naming.lookup(getQueueUri(host, port));
@@ -238,20 +241,20 @@ public class GoogolRegistry {
     }
 
     public void downloaderNotification(String downloader) throws RemoteException, MalformedURLException, NotBoundException {
-        if (adminConsoleExists()) {
-            InterfaceAdminConsole admin = getAdminConsole();
+        if (monitorIsActive()) {
+            InterfaceAdminConsole admin = lookupMonitor();
             admin.downloaderNotification(downloader);    
         }
     }
 
     public void barrelNotification(String name) throws AccessException, RemoteException, MalformedURLException, NotBoundException {
-        if (adminConsoleExists()) {
-            InterfaceAdminConsole admin = getAdminConsole();
+        if (monitorIsActive()) {
+            InterfaceAdminConsole admin = lookupMonitor();
             admin.barrelNotification(name);
         }
     }
 
-    private InterfaceAdminConsole getAdminConsole() throws MalformedURLException, RemoteException, NotBoundException {
+    private InterfaceAdminConsole lookupMonitor() throws MalformedURLException, RemoteException, NotBoundException {
         return (InterfaceAdminConsole) Naming.lookup(getMonitorUri());
     }
 
@@ -259,16 +262,24 @@ public class GoogolRegistry {
         return "rmi://" + host + ":" + port + "/" + MONITOR_NAME;
     }
 
-    private boolean adminConsoleExists() throws AccessException, RemoteException {
+    private boolean monitorIsActive() throws AccessException, RemoteException {
         updateEntries();
         return entries.contains(MONITOR_NAME);
     }
 
     public void topSearchChangedNotification(Set<String> topSearches) throws MalformedURLException, RemoteException, NotBoundException {
-        if (adminConsoleExists()) {
-            InterfaceAdminConsole admin = getAdminConsole();
+        if (monitorIsActive()) {
+            InterfaceAdminConsole admin = lookupMonitor();
             admin.topSearchChangedNotification(topSearches);
         }
+    }
+
+    public InterfaceSearchModule lookupSearch() throws MalformedURLException, RemoteException, NotBoundException {
+        return (InterfaceSearchModule) Naming.lookup(getSearchUri());
+    }
+
+    private String getSearchUri() {
+        return "rmi://" + host + ":" + port + "/" + SEARCH_NAME;
     }
 
 }

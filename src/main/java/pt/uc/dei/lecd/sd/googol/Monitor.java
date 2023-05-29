@@ -41,12 +41,14 @@ public class Monitor extends UnicastRemoteObject implements InterfaceAdminConsol
 
     @Override
     public void downloaderNotification(String name) throws RemoteException {
-        downloaders.add(name);
+        downloaders.clear();
+        downloaders.addAll(registry.getListOfDownloaders());
     }
 
     @Override
     public void barrelNotification(String name) throws RemoteException {
-        barrels.add(name);
+        barrels.clear();
+        barrels.addAll(registry.getListOfBarrels());
     }
 
     @Override
@@ -58,7 +60,7 @@ public class Monitor extends UnicastRemoteObject implements InterfaceAdminConsol
         return topSearches;
     }
 
-    private void loadRegistry() {
+    private void loadRegistry() throws AccessException, RemoteException {
         downloaders.addAll(registry.getListOfDownloaders());
         barrels.addAll(registry.getListOfBarrels());
     }

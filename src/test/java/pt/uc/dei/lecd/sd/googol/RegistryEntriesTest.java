@@ -2,6 +2,8 @@ package pt.uc.dei.lecd.sd.googol;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.rmi.AccessException;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +21,7 @@ public class RegistryEntriesTest {
     }
 
     @Test
-    void shouldReturnEmptyListOfDownloaders() {
+    void shouldReturnEmptyListOfDownloaders() throws AccessException, RemoteException {
         String[] entries = {};
         GoogolRegistry reg = new GoogolRegistry(entries);
         List<String> downloaders = reg.getListOfDownloaders();
@@ -27,7 +29,7 @@ public class RegistryEntriesTest {
     }
 
     @Test
-    void shouldReturnListOfDownloaders() {
+    void shouldReturnListOfDownloaders() throws AccessException, RemoteException {
         String[] entries = {"googol/downloaders/downloader_1", "someotherapp/someotherentry"};
         GoogolRegistry reg = new GoogolRegistry(entries);
         List<String> downloaders = reg.getListOfDownloaders();
@@ -36,21 +38,21 @@ public class RegistryEntriesTest {
     }
 
     @Test
-    void shouldReturnNewCorrectNameWhenEntriesIsEmpty() {
+    void shouldReturnNewCorrectNameWhenEntriesIsEmpty() throws AccessException, RemoteException {
         String[] entries = {};
         GoogolRegistry reg = new GoogolRegistry(entries);
         Assertions.assertEquals("googol/downloaders/downloader_1", reg.getNextDownloaderName());
     }
 
     @Test
-    void shouldReturnNewCorrectName() {
+    void shouldReturnNewCorrectName() throws AccessException, RemoteException {
         String[] entries = {"googol/downloaders/downloader_2"};
         GoogolRegistry reg = new GoogolRegistry(entries);
         Assertions.assertEquals("googol/downloaders/downloader_3", reg.getNextDownloaderName());
     }
 
     @Test 
-    void shouldGetARandomBarrel() {
+    void shouldGetARandomBarrel() throws AccessException, RemoteException {
         String[] entries = {
             "googol/barrels/barrel_1",
             "googol/barrels/barrel_2",

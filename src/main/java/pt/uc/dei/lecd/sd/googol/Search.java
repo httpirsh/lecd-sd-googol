@@ -105,15 +105,14 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 		sortedTerms.sort(Collections.reverseOrder(Map.Entry.comparingByValue()));
 
 		// Extract the top 10 terms (up to the limit) and return them as a list of strings
-		List<String> topTerms = new ArrayList<>();
+		List<String> newTopSearches = new ArrayList<>();
 		for (int i = 0; i < 10 && i < sortedTerms.size(); i++) {
-			topTerms.add(sortedTerms.get(i).getKey());
+			newTopSearches.add(sortedTerms.get(i).getKey());
 		}
-
-		boolean topSearchChanged = (this.topSearches.retainAll(topTerms) || this.topSearches.isEmpty());
-		this.topSearches.addAll(topTerms);
-
-		if (topSearchChanged) {
+	
+		if (!topSearches.containsAll(newTopSearches)) {
+			this.topSearches.clear();
+			this.topSearches.addAll(newTopSearches);	
 			registry.topSearchChangedNotification(topSearches);
 		}
 	}

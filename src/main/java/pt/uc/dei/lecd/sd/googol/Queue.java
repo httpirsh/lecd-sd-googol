@@ -34,16 +34,12 @@ public class Queue extends UnicastRemoteObject implements InterfaceQueue {
      */
     public synchronized void enqueue(Object element) throws RemoteException {
         queue.addLast(element);
-        log.info("Enqueue element {}. Size is {}", element, queue.size());
-
     }
 
     /**
      * O método dequeue remove e retorna o elemento na frente da fila. Se a fila estiver vazia, retorna nulo.
      */
     public synchronized Object dequeue() throws RemoteException {
-        log.info("dequeueing... size is {}", size());
-
         if (queue.isEmpty()) {
             return null;
         }

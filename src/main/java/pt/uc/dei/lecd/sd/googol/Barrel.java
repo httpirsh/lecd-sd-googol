@@ -227,10 +227,12 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
         } 
     }
 
-    public boolean stop() throws AccessException, RemoteException, NotBoundException {
+    public boolean stop() throws AccessException, RemoteException, NotBoundException, MalformedURLException {
         try {
             log.info("Stopping barrel {}", name);
-            return registry.unbind(this);
+            registry.unbind(this);
+            registry.barrelNotification(this.name); // notify the admin console that this downloader is active
+            return true;
         } catch (NoSuchObjectException e) {
             log.error("Error stopping object {}", name, e);
             return false;

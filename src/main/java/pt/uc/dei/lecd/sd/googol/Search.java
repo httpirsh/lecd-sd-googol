@@ -94,6 +94,28 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 		}
 	}
 
+	public void listPages (String terms) throws RemoteException{
+		InterfaceBarrel barrel;
+		try {
+			barrel = registry.lookupBarrelInRoundRobin();
+			HashSet<String> urls = barrel.searchTerms(terms);
+			if (urls == null) {
+				System.out.println("Não existem páginas que contenham esses termos");
+			}
+			else{
+				for (String url : urls){
+					System.out.println("Lista de páginas com ligação ao url " + url);
+					System.out.println(barrel.getPagesWithLinkTo(url));
+				}
+			}
+
+
+		} catch (MalformedURLException | NotBoundException e) {
+			log.error("Unable to search due to error getting a barrel.", e);
+			throw new RemoteException("Unable to search due to error getting a barrel.", e);
+		}
+	}
+
 	private void updateSearchLogs(String terms) throws MalformedURLException, RemoteException, NotBoundException {
 		searchLogs.add(terms);
 
@@ -183,6 +205,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
             return false;
         } 
     }
+
 
     public boolean stop() throws AccessException, RemoteException, NotBoundException {
         try {

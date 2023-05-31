@@ -165,16 +165,21 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
      */
     public HashSet <String> sortImp(HashSet <String> results) {
     	HashSet <String> sortedImp = new HashSet<>();
+        int max;
         String greaterImportance;
     	for (int i=1; i<=results.size(); i++) {
-    		int max = 0;
+    		max = 0;
     		greaterImportance = "";
     		for(String result: results) {
-                log.debug("sortedImp is {} and pageLinkCounts is {} and result is {}", sortedImp, pageLinkCounts, result);
-    			if(!sortedImp.contains(result) && pageLinkCounts.getOrDefault(result, 0) >= max) {
-    				max = pageLinkCounts.getOrDefault(result, 0);
+                //log.debug("sortedImp is {} and pageLinkCounts is {} and result is {}", sortedImp, pageLinkCounts, result);
+    			if(!sortedImp.contains(result) && pageLinks.get(result) != null && pageLinkCounts.get(result)>= max) {
+    				max = pageLinkCounts.get(result);
     				greaterImportance = result;
     			}
+                if (pageLinks.get(result)==null){
+                    max= 0;
+                    greaterImportance = result;
+                }
     		}
     	sortedImp.add(greaterImportance);
     	}
@@ -208,6 +213,25 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
     	return shortQuote;
     }
 
+    /**
+     * O método getPagesWithLinkTo retorna uma lista de URLs têm ligação para uma página
+     * específica.
+     *
+     * O método percorre todas as páginas armazenadas no HashMap pageLinks e verifica se
+     * cada uma contém ligação para a página especificada pelo parâmetro 'url'. Se uma
+     * página contiver ligação para essa página, seu URL é adiconado à lista pagesWithLink.
+     * Por fim, essa lista é retornada como resultado da consulta.
+     */
+    public ArrayList<String> getPagesWithLinkTo(String url){
+        ArrayList<String> pagesWithLink = new ArrayList<String>();
+        for (String pageUrl : pageLinks.keySet()) {
+            ArrayList<String> links = pageLinks.get(pageUrl);
+            if (links.contains(url)) {
+                pagesWithLink.add(pageUrl);
+            }
+        }
+        return pagesWithLink;
+    }
     @Override
     public String ping() {
         log.info("ping was called, answering pong.");

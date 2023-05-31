@@ -213,6 +213,25 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
     	return shortQuote;
     }
 
+    /**
+     * O método getPagesWithLinkTo retorna uma lista de URLs têm ligação para uma página
+     * específica.
+     *
+     * O método percorre todas as páginas armazenadas no HashMap pageLinks e verifica se
+     * cada uma contém ligação para a página especificada pelo parâmetro 'url'. Se uma
+     * página contiver ligação para essa página, seu URL é adiconado à lista pagesWithLink.
+     * Por fim, essa lista é retornada como resultado da consulta.
+     */
+    public ArrayList<String> getPagesWithLinkTo(String url){
+        ArrayList<String> pagesWithLink = new ArrayList<String>();
+        for (String pageUrl : pageLinks.keySet()) {
+            ArrayList<String> links = pageLinks.get(pageUrl);
+            if (links.contains(url)) {
+                pagesWithLink.add(pageUrl);
+            }
+        }
+        return pagesWithLink;
+    }
     @Override
     public String ping() {
         log.info("ping was called, answering pong.");

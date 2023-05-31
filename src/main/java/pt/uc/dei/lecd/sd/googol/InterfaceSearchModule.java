@@ -16,4 +16,6 @@ public interface InterfaceSearchModule extends Remote {
 
 	Set<String> getTopSearches() throws RemoteException;
 
+	void listPages (String terms) throws RemoteException;
+
 }

@@ -71,7 +71,8 @@ public class RmiClient {
 					for (String page : pages) {
 						System.out.println(page);
 						if(registoLogin) {
-							// metodo para mostrar a lista de paginas com ligação para um pagina especifica
+							// lista de paginas com ligação para um pagina especifica
+							this.search.listPages(termos);
 						}
 					}
 					break;

@@ -165,16 +165,21 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
      */
     public HashSet <String> sortImp(HashSet <String> results) {
     	HashSet <String> sortedImp = new HashSet<>();
+        int max;
         String greaterImportance;
     	for (int i=1; i<=results.size(); i++) {
-    		int max = 0;
+    		max = 0;
     		greaterImportance = "";
     		for(String result: results) {
-                log.debug("sortedImp is {} and pageLinkCounts is {} and result is {}", sortedImp, pageLinkCounts, result);
-    			if(!sortedImp.contains(result) && pageLinkCounts.getOrDefault(result, 0) >= max) {
-    				max = pageLinkCounts.getOrDefault(result, 0);
+                //log.debug("sortedImp is {} and pageLinkCounts is {} and result is {}", sortedImp, pageLinkCounts, result);
+    			if(!sortedImp.contains(result) && pageLinks.get(result) != null && pageLinkCounts.get(result)>= max) {
+    				max = pageLinkCounts.get(result);
     				greaterImportance = result;
     			}
+                if (pageLinks.get(result)==null){
+                    max= 0;
+                    greaterImportance = result;
+                }
     		}
     	sortedImp.add(greaterImportance);
     	}

@@ -40,7 +40,7 @@ public class RmiClient {
 	public static void menu() {
     		// menu com as opções que utilizador pode realizar
     		System.out.println("1. Indexar um novo Url\n"
-    				+ "2. Consultar lista de páginas com ligação para uma página específica\n"
+    				+ "2. Consultar lista de páginas que contenham um conjunto de termos\n"
 					+ "3. Página de administração atualizada em tempo real\n"
     				+ "4. Sair\n");
     		
@@ -50,7 +50,7 @@ public class RmiClient {
 
 	public void iniciar(Scanner sc) throws RemoteException, NotBoundException, MalformedURLException {
 		int opcao;
-		registoLogin(sc);
+		boolean registoLogin = registoLogin(sc);
 		do {
 			menu();
 			opcao = validaInteiro(sc);
@@ -70,10 +70,14 @@ public class RmiClient {
 					List<String> pages = this.search.search(termos);
 					for (String page : pages) {
 						System.out.println(page);
+						if(registoLogin) {
+							// metodo para mostrar a lista de paginas com ligação para um pagina especifica
+						}
 					}
 					break;
 
 				case 3:
+					// pagina admistrativa
 					Set<String> top10 = search.getTopSearches();
 					System.out.println("O top de termos de pesquisa:");
 					for (String search : top10) {

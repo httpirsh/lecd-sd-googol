@@ -38,9 +38,11 @@ public interface InterfaceBarrel extends Remote {
 
 	String getShortQuote(String url) throws RemoteException;
 
-	ArrayList<String> getPagesWithLinkTo(String url);
-
 	String ping() throws RemoteException;
+
+
+
+
 
 }
 

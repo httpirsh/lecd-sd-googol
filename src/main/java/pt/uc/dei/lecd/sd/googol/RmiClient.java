@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * O programa consiste num menu de opções que permite ao usuário interagir com o módulo de busca remoto.
  */
 @Slf4j
+@SpringBootApplication
 public class RmiClient {
 	private final String name;
 	private InterfaceSearchModule search;
@@ -71,7 +75,7 @@ public class RmiClient {
 					for (String page : pages) {
 						System.out.println(page);
 						if(registoLogin) {
-							// lista de paginas com ligação para um pagina especifica
+							// Lista de páginas com ligação para uma página especfica
 							this.search.listPages(termos);
 						}
 					}
@@ -178,6 +182,7 @@ public class RmiClient {
 	}
 
 	public static void main(String [] args) throws MalformedURLException, NotBoundException, RemoteException {
+		SpringApplication.run(RmiClient.class, args);
 		Scanner sc = new Scanner(System.in);
 		ArgumentsProcessor arguments = new ArgumentsProcessor(args);
         String host = arguments.getHost();

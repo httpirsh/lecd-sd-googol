@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Googol</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital@1&family=Space+Mono&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <form>
+        <div id="box1">
+            <h1>Googol</h1>
+            <label for="search"></label>
+            <input type="text" id="search" name="search" placeholder="..." th:value="${search}">
+
+            <a href="https://www.google.com" target="_self" title="go to google">
+                <button style="background-color: lightskyblue;color:rgb(41, 40, 40);border-radius:5px" type="submit">Search</button>
+            </a>
+        </div>
+    </form>
+</body>
+
+</html>

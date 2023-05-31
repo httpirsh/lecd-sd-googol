@@ -94,6 +94,11 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 		}
 	}
 
+	/** 
+	 * O método listPages realiza uma busca por URLs associadas aos termos fornecidos. 
+	 * Recupera um objeto barrel de um registro, depois realiza a busca e imprime a lista de páginas com links para esses URLs. 
+	 * Se houver algum erro ao obter o objeto barrel ou realizar a busca, uma exceção RemoteException é lançada.
+	 */
 	public void listPages (String terms) throws RemoteException{
 		InterfaceBarrel barrel;
 		try {
@@ -105,6 +110,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 			else{
 				for (String url : urls){
 					System.out.println("Lista de páginas com ligação ao url " + url);
+					// TODO: pagesWithLinkTo
 					System.out.println(barrel.getPagesWithLinkTo(url));
 				}
 			}

@@ -55,8 +55,10 @@ public class GoogolRegistry {
      * Devolve a lista de nomes dos downloaders que estão no registry.
      * 
      * @return a lista de nomes dos downloaders.
+     * @throws RemoteException
+     * @throws AccessException
      */
-    public List<String> getListOfDownloaders() {
+    public List<String> getListOfDownloaders() throws AccessException, RemoteException {
         return getListStartsWith(DOWNLOADER_NAME_PREFIX);
     }
 
@@ -64,8 +66,10 @@ public class GoogolRegistry {
      * Devolve a lista de nomes dos barrels que estão no registry.
      * 
      * @return a lista de nomes dos barrels.
+     * @throws RemoteException
+     * @throws AccessException
      */
-    public List<String> getListOfBarrels() {
+    public List<String> getListOfBarrels() throws AccessException, RemoteException {
         return getListStartsWith(BARREL_NAME_PREFIX);
     }
 
@@ -73,8 +77,10 @@ public class GoogolRegistry {
      * Calcula o nome do próximo downloader com base nos existentes.
      * 
      * @return o nome do downloader
+     * @throws RemoteException
+     * @throws AccessException
      */
-    public String getNextDownloaderName() {
+    public String getNextDownloaderName() throws AccessException, RemoteException {
 
         List<String> downloaders = getListOfDownloaders();
         if (downloaders.isEmpty()) {
@@ -108,7 +114,7 @@ public class GoogolRegistry {
         return "rmi://" + host + ":" + port + "/" + name;
     }
 
-    public String getNextBarrelName() {
+    public String getNextBarrelName() throws AccessException, RemoteException {
         List<String> barrels = getListOfBarrels();
         if (barrels.isEmpty()) {
             return BARREL_NAME_PREFIX + "1";
@@ -121,7 +127,8 @@ public class GoogolRegistry {
         return BARREL_NAME_PREFIX + (number + 1);
     }
 
-    private List<String> getListStartsWith(String start) {
+    private List<String> getListStartsWith(String start) throws AccessException, RemoteException {
+        updateEntries();
         ArrayList<String> itemStrings = new ArrayList<>();
 
         for (String entry: entries) {
@@ -140,7 +147,6 @@ public class GoogolRegistry {
     }
 
     public void bind(Barrel barrel) throws AccessException, RemoteException, AlreadyBoundException {
-        updateEntries();
         barrel.setName(getNextBarrelName());
         registry.bind(barrel.getName(), barrel);
     }
@@ -173,7 +179,7 @@ public class GoogolRegistry {
 
     public boolean unbind(Downloader downloader) throws AccessException, RemoteException, NotBoundException {
         registry.unbind(downloader.getName());
-        return UnicastRemoteObject.unexportObject(downloader, false);
+        return UnicastRemoteObject.unexportObject(downloader, true);
     }
 
     public boolean unbind(Queue remoteQueue) throws AccessException, RemoteException, NotBoundException {
@@ -187,12 +193,11 @@ public class GoogolRegistry {
     }
 
     public InterfaceBarrel lookupBarrelInRoundRobin() throws AccessException, RemoteException, MalformedURLException, NotBoundException {
-        updateEntries();
         String barrelName = getNextBarrelNameInRoundRobin();
         return (InterfaceBarrel) Naming.lookup(getBarrelUri(barrelName, host, port));
     }
 
-    protected String getNextBarrelNameInRoundRobin() {
+    protected String getNextBarrelNameInRoundRobin() throws AccessException, RemoteException {
         List<String> barrels = getListOfBarrels();
 
         if (barrels.isEmpty()) {
@@ -223,7 +228,7 @@ public class GoogolRegistry {
         return null;
     }
 
-    public List<InterfaceBarrel> getBarrels() {
+    public List<InterfaceBarrel> getBarrels() throws AccessException, RemoteException {
         ArrayList<InterfaceBarrel> barrels = new ArrayList<>();
         List<String> barrelNames = getListOfBarrels();
 
@@ -242,15 +247,15 @@ public class GoogolRegistry {
 
     public void downloaderNotification(String downloader) throws RemoteException, MalformedURLException, NotBoundException {
         if (monitorIsActive()) {
-            InterfaceAdminConsole admin = lookupMonitor();
-            admin.downloaderNotification(downloader);    
+            InterfaceAdminConsole monitor = lookupMonitor();
+            monitor.downloaderNotification(downloader);    
         }
     }
 
     public void barrelNotification(String name) throws AccessException, RemoteException, MalformedURLException, NotBoundException {
         if (monitorIsActive()) {
-            InterfaceAdminConsole admin = lookupMonitor();
-            admin.barrelNotification(name);
+            InterfaceAdminConsole monitor = lookupMonitor();
+            monitor.barrelNotification(name);
         }
     }
 

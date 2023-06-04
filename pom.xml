@@ -142,7 +142,7 @@
                             <finalName>queue</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>pt.uc.dei.lecd.sd.googol.RemoteQueue</mainClass>
+                                    <mainClass>pt.uc.dei.lecd.sd.googol.Queue</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
@@ -175,6 +175,22 @@
                             <archive>
                                 <manifest>
                                     <mainClass>pt.uc.dei.lecd.sd.googol.RmiClient</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>make-console-monitor</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>ConsoleMonitor</classifier>
+                            <finalName>ConsoleMonitor</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>pt.uc.dei.lecd.sd.googol.ConsoleMonitor</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

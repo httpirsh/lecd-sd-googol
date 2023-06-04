@@ -21,7 +21,7 @@ public class MonitorTest {
     }
 
     @Test
-    void adminIsNotifiedWhenDownloaderConnects() throws RemoteException, AlreadyBoundException, MalformedURLException, NotBoundException, UnknownHostException, InterruptedException {
+    void adminIsNotifiedWhenDownloaderConnectsAndStops() throws RemoteException, AlreadyBoundException, MalformedURLException, NotBoundException, UnknownHostException, InterruptedException {
         Monitor monitor = new Monitor();
         monitor.connect(host, port);
 
@@ -30,12 +30,16 @@ public class MonitorTest {
 
         Assertions.assertTrue(monitor.getDownloadersNames().contains(downloader.getName()));
 
-        monitor.disconnect();
         downloader.stop();
+
+        Assertions.assertFalse(monitor.getDownloadersNames().contains(downloader.getName()));
+
+        monitor.disconnect();
+
     }
 
     @Test
-    void adminGetsDownloaderWhenConnects() throws RemoteException, MalformedURLException, NotBoundException, AlreadyBoundException, InterruptedException, UnknownHostException {
+    void adminGetsDownloaderWhenConnectsAndStops() throws RemoteException, MalformedURLException, NotBoundException, AlreadyBoundException, InterruptedException, UnknownHostException {
         Downloader downloader = new Downloader();
         downloader.connect(host, port);
 
@@ -44,12 +48,14 @@ public class MonitorTest {
 
         Assertions.assertTrue(monitor.getDownloadersNames().contains(downloader.getName()));
 
-        monitor.disconnect();
         downloader.stop();
+        Assertions.assertFalse(monitor.getDownloadersNames().contains(downloader.getName()));
+
+        monitor.disconnect();
     }
 
     @Test
-    void adminIsNotifiedWhenBarrelStarts() throws RemoteException, AlreadyBoundException, NotBoundException, MalformedURLException {
+    void adminIsNotifiedWhenBarrelStartsAndStops() throws RemoteException, AlreadyBoundException, NotBoundException, MalformedURLException {
         Monitor monitor = new Monitor();
         monitor.connect(host, port);
         
@@ -58,8 +64,10 @@ public class MonitorTest {
 
         Assertions.assertTrue(monitor.getBarrelsNames().contains(barrel.getName()));
 
-        monitor.disconnect();
         barrel.stop();
+        Assertions.assertFalse(monitor.getBarrelsNames().contains(barrel.getName()));
+
+        monitor.disconnect();
     }
 
     @Test
@@ -88,8 +96,10 @@ public class MonitorTest {
         monitor.connect(host, port);
 
         search.search("hello");
-
         Assertions.assertTrue(monitor.getTopSearches().contains("hello"));
+
+        search.search("other");
+        Assertions.assertTrue(monitor.getTopSearches().contains("other"));
 
         monitor.disconnect();
     }

@@ -42,7 +42,7 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
         this.running = false;
     }
 
-    private void updateBarrels() {
+    private void updateBarrels() throws AccessException, RemoteException {
         barrels = registry.getBarrels();
     }
 
@@ -139,14 +139,16 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
      * @throws NotBoundException
      * @throws RemoteException
      * @throws AccessException
+     * @throws MalformedURLException
      */
-    public void stop() throws InterruptedException, AccessException, RemoteException, NotBoundException {
+    public void stop() throws InterruptedException, AccessException, RemoteException, NotBoundException, MalformedURLException {
         this.running = false;
-        log.info("Downloader " + getName() + " stopping... waiting for processing thread to finish.");
         if (processingThread != null) {
+            log.info("Downloader " + getName() + " stopping... waiting for processing thread to finish.");
             processingThread.join();
         }
         registry.unbind(this);
+        registry.downloaderNotification(this.name); // notify the admin console that this downloader is active
         log.info("Downloader " + getName() + " stopped.");
     }
 

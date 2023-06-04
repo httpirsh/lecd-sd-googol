@@ -2,8 +2,9 @@
 Googol: Motor de pesquisa de páginas Web.
 
 Como executar o projeto:
-* Para correr o código, é necessário correr a aplicação Googol primeiro (Googol Cluster), de modo a inicializar e configurar
-os componentes da aplicação, os quais 2 downloaders e 2 barrels.
+* Para correr as várias funcionalidades é necessário escrever no terminal "java -jar ", seguido da funcionalidade desejada. Para correr qualquer outra, sejam barrels ou downloaders, é necessário abrir outro terminal de modo a correrem em paralelo.
+
+A aplicação Googol primeiro (Googol Cluster), de modo a inicializar e configurar os componentes da aplicação, os quais 2 downloaders e 2 barrels.
 Numa fase seguinte, basta correr a classe GoogolClient, que inicia um RmiClient e connecta-o com o cluster. 
 No RmiClient será pedido ao utilizador as suas informações e respetivas intenções, através de um menu.
 
@@ -52,4 +53,4 @@ Tratamento de exceções e FailOver;
 Página de administração atualizada em tempo real e respetivos métodos;
 Criação das classes Queue, URLQueue e respetivos métodos para a sua conexão (connectToQueue(), enqueue(), dequeue());
 Criação dos testes para testagem (Test);
-Criação da aplicação Googol (Googol Cluster) e respetivos objetos (2 downloaders e 2 barrels);
+Criação dos objetos (downloaders e barrels) e respetiva consola para os inicializar;

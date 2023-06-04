@@ -115,7 +115,6 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 				}
 			}
 
-
 		} catch (MalformedURLException | NotBoundException e) {
 			log.error("Unable to search due to error getting a barrel.", e);
 			throw new RemoteException("Unable to search due to error getting a barrel.", e);

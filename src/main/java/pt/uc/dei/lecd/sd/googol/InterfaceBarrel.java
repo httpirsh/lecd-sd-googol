@@ -40,6 +40,8 @@ public interface InterfaceBarrel extends Remote {
 
 	String ping() throws RemoteException;
 
+	public ArrayList<String> getPagesWithLinkTo(String url) throws RemoteException;
+
 
 
 

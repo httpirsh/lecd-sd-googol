@@ -222,7 +222,7 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
      * página contiver ligação para essa página, seu URL é adiconado à lista pagesWithLink.
      * Por fim, essa lista é retornada como resultado da consulta.
      */
-    public ArrayList<String> getPagesWithLinkTo(String url){
+    public ArrayList<String> getPagesWithLinkTo(String url) throws RemoteException {
         ArrayList<String> pagesWithLink = new ArrayList<String>();
         for (String pageUrl : pageLinks.keySet()) {
             ArrayList<String> links = pageLinks.get(pageUrl);

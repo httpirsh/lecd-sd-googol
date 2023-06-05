@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="refresh" content="5">
+</head> 
+
+<body>
+    <h1>Googol Monitoring Page</h1>
+
+    <div>
+        <h2 th:if="${downloaders.empty}">No downloaders</h2>
+        <div th:unless="${downloaders.empty}">
+            <h2>Downloaders</h2>
+            <ul>
+                <li th:each="downloader : ${downloaders}">
+                    <span th:text="${downloader}" th:remove="tag">downloader_name</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div>
+        <h2 th:if="${barrels.empty}">No barrels</h2>
+        <div th:unless="${barrels.empty}">
+            <h2>Barrels</h2>
+            <ul>
+                <li th:each="barrel : ${barrels}">
+                    <span th:text="${barrel}" th:remove="tag">barrel_name</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>

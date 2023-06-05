@@ -4,7 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-public interface InterfaceAdminConsole extends Remote {
+public interface InterfaceMonitor extends Remote {
     public void downloaderNotification(String name) throws RemoteException;
 
     public void barrelNotification(String name) throws RemoteException;

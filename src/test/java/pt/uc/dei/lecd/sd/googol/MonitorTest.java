@@ -21,6 +21,19 @@ public class MonitorTest {
     }
 
     @Test
+    void monitorIsActiveWhenConnected() throws RemoteException, AlreadyBoundException, NotBoundException {
+        Monitor monitor = new Monitor();
+        monitor.connect(host, port);
+
+        GoogolRegistry registry = new GoogolRegistry(host, port);
+        Assertions.assertTrue(registry.monitorIsActive());
+
+        monitor.disconnect();
+
+        Assertions.assertFalse(registry.monitorIsActive());
+    }
+
+    @Test
     void adminIsNotifiedWhenDownloaderConnectsAndStops() throws RemoteException, AlreadyBoundException, MalformedURLException, NotBoundException, UnknownHostException, InterruptedException {
         Monitor monitor = new Monitor();
         monitor.connect(host, port);

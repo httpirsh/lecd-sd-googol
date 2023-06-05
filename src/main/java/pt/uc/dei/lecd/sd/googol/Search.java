@@ -110,7 +110,6 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 			else{
 				for (String url : urls){
 					System.out.println("Lista de páginas com ligação ao url " + url);
-					// TODO: pagesWithLinkTo
 					System.out.println(barrel.getPagesWithLinkTo(url));
 				}
 			}

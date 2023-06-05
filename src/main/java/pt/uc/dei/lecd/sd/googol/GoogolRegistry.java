@@ -247,34 +247,34 @@ public class GoogolRegistry {
 
     public void downloaderNotification(String downloader) throws RemoteException, MalformedURLException, NotBoundException {
         if (monitorIsActive()) {
-            InterfaceAdminConsole monitor = lookupMonitor();
+            InterfaceMonitor monitor = lookupMonitor();
             monitor.downloaderNotification(downloader);    
         }
     }
 
     public void barrelNotification(String name) throws AccessException, RemoteException, MalformedURLException, NotBoundException {
         if (monitorIsActive()) {
-            InterfaceAdminConsole monitor = lookupMonitor();
+            InterfaceMonitor monitor = lookupMonitor();
             monitor.barrelNotification(name);
         }
     }
 
-    private InterfaceAdminConsole lookupMonitor() throws MalformedURLException, RemoteException, NotBoundException {
-        return (InterfaceAdminConsole) Naming.lookup(getMonitorUri());
+    private InterfaceMonitor lookupMonitor() throws MalformedURLException, RemoteException, NotBoundException {
+        return (InterfaceMonitor) Naming.lookup(getMonitorUri());
     }
 
     private String getMonitorUri() {
         return "rmi://" + host + ":" + port + "/" + MONITOR_NAME;
     }
 
-    private boolean monitorIsActive() throws AccessException, RemoteException {
+    protected boolean monitorIsActive() throws AccessException, RemoteException {
         updateEntries();
         return entries.contains(MONITOR_NAME);
     }
 
     public void topSearchChangedNotification(Set<String> topSearches) throws MalformedURLException, RemoteException, NotBoundException {
         if (monitorIsActive()) {
-            InterfaceAdminConsole admin = lookupMonitor();
+            InterfaceMonitor admin = lookupMonitor();
             admin.topSearchChangedNotification(topSearches);
         }
     }

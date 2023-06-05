@@ -8,7 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Monitor extends UnicastRemoteObject implements InterfaceAdminConsole {
+public class Monitor extends UnicastRemoteObject implements InterfaceMonitor {
 
     private HashSet<String> downloaders;
     private GoogolRegistry registry;

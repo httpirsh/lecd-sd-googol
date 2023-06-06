@@ -53,9 +53,9 @@ public class DownloadAndSearchTest {
 
         assertTrue(downloader.indexURL("https://en.wikipedia.org/wiki/Stranger_Things"));
 
-        List<String> results = searchModule.search("Stranger");
+        List<Page> results = searchModule.search("Stranger");
 
-        log.debug("Received results for {} are {}", "Stranger", String.join(", ", results));
+        log.debug("Received results for {} are {}", "Stranger", results);
 
         assertTrue(results.size() > 0);
         downloader.stop();

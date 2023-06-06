@@ -64,27 +64,22 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * conteúdo da página. Cada página de resultados é exibida em grupos de 10, utilizando um
 	 * separador que indica o início de uma nova página de resultados.
 	 */
-	public List<String> search(String terms) throws RemoteException {
+	public List<Page> search(String terms) throws RemoteException {
 		InterfaceBarrel barrel;
 		try {
 			barrel = registry.lookupBarrelInRoundRobin();
 		
 			updateSearchLogs(terms);
 			HashSet<String> urls = barrel.searchTerms(terms);
-			List<String> results = new ArrayList<>();
+			List<Page> results = new ArrayList<>();
 
-			if (urls == null) {
-				results.add("Não existem páginas que contenham esses termos");
-			} else {
-				int i = 0;
+			if (urls != null) {
 				for (String url : urls) {
-					if (i % 10 == 0) {
-						results.add("\n-------- Página " + (i / 10 + 1) + " --------\n");
-					}
-					results.add(barrel.getPageTitle(url));
-					results.add(url);
-					results.add(barrel.getShortQuote(url));
-					i++;
+					Page page = new Page();
+					page.url = url;
+					page.summary = barrel.getShortQuote(url);
+					page.title = barrel.getPageTitle(url);
+					results.add(page);
 				}
 			}
 			return results;
@@ -135,12 +130,8 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 		for (int i = 0; i < 10 && i < sortedTerms.size(); i++) {
 			newTopSearches.add(sortedTerms.get(i).getKey());
 		}
-	
-		if (!topSearches.containsAll(newTopSearches)) {
-			this.topSearches.clear();
-			this.topSearches.addAll(newTopSearches);	
-			registry.topSearchChangedNotification(topSearches);
-		}
+
+		registry.topSearchChangedNotification(newTopSearches);
 	}
 
 	/**

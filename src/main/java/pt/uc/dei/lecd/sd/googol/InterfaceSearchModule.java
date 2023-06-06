@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface InterfaceSearchModule extends Remote {
 	
-	List<String> search(String terms) throws RemoteException;
+	List<Page> search(String terms) throws RemoteException;
 	
 	void indexNewURL(String url)  throws RemoteException;
 	

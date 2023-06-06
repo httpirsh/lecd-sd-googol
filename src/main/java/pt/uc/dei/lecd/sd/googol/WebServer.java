@@ -10,9 +10,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WebMonitor {
+public class WebServer {
 
     private static Monitor monitor;
+    private static GoogolRegistry registry;
+
+    public static GoogolRegistry getRegistry() {
+        return registry;
+    }
 
     public static Monitor getMonitor() {
         return monitor;
@@ -27,7 +32,8 @@ public class WebMonitor {
         try {
             monitor = new Monitor();
             monitor.connect(host, port);
-            SpringApplication.run(WebMonitor.class, args);
+            registry = new GoogolRegistry(host, port);
+            SpringApplication.run(WebServer.class, args);
         } catch (Exception e) {
             e.printStackTrace();
         } 

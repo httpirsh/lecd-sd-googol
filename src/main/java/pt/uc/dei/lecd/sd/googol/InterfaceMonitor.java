@@ -2,13 +2,13 @@ package pt.uc.dei.lecd.sd.googol;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Set;
+import java.util.List;
 
 public interface InterfaceMonitor extends Remote {
     public void downloaderNotification(String name) throws RemoteException;
 
     public void barrelNotification(String name) throws RemoteException;
 
-    public void topSearchChangedNotification(Set<String> topSearches) throws RemoteException;
+    public void topSearchChangedNotification(List<String> newTopSearches) throws RemoteException;
 
 }

@@ -34,6 +34,7 @@ public class Queue extends UnicastRemoteObject implements InterfaceQueue {
      */
     public synchronized void enqueue(Object element) throws RemoteException {
         queue.addLast(element);
+        log.info("Queued: {}", element);
     }
 
     /**
@@ -43,7 +44,9 @@ public class Queue extends UnicastRemoteObject implements InterfaceQueue {
         if (queue.isEmpty()) {
             return null;
         }
-        return queue.removeFirst();
+        Object element = queue.removeFirst();
+        log.info("DeQueued: {}", element);
+        return element;
     }
 
     /**

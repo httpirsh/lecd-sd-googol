@@ -32,6 +32,18 @@
         </div>
     </div>
 
+    <div>
+        <h2 th:if="${topsearches.empty}">No top searches</h2>
+        <div th:unless="${topsearches.empty}">
+            <h2>Top searches</h2>
+            <ul>
+                <li th:each="search : ${topsearches}">
+                    <span th:text="${search}" th:remove="tag">search_name</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
 </body>
 
 </html>

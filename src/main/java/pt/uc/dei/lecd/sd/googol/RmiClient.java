@@ -67,9 +67,11 @@ public class RmiClient {
 					// Consultar os resultados da pesquisa
 					System.out.print("Digite os termos da pesquisa: ");
 					String termos = sc.nextLine();
-					List<String> pages = this.search.search(termos);
-					for (String page : pages) {
-						System.out.println(page);
+					List<Page> pages = this.search.search(termos);
+					for (Page page : pages) {
+						System.out.println(page.title);
+						System.out.println(page.url);
+						System.out.println(page.summary);
 						if(registoLogin) {
 							// Lista de páginas com ligação para uma página especfica
 							this.search.listPages(termos);

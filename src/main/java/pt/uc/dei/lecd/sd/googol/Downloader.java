@@ -170,11 +170,12 @@ public class Downloader extends UnicastRemoteObject implements Runnable {
         while (this.running) {
             try {
                 Thread.sleep(1000);
-
-                String url = (String) queue.dequeue();
-                if (url != null) {
-                    log.info("Downloader {} indexing url {}", this.name, url);
-                    indexURL(url);
+                if (queue != null) {
+                    String url = (String) queue.dequeue();
+                    if (url != null) {
+                        log.info("Downloader {} indexing url {}", this.name, url);
+                        indexURL(url);
+                    }
                 }
             } catch (RemoteException | MalformedURLException | NotBoundException e) {
                 log.error("Error in downloader {} while trying to dequeue", this.name, e);

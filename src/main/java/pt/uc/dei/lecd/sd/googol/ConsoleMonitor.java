@@ -1,6 +1,8 @@
 package pt.uc.dei.lecd.sd.googol;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -25,15 +27,15 @@ public class ConsoleMonitor extends Monitor {
     }
 
     @Override
-    public void topSearchChangedNotification(Set<String> topSearches) {
+    public void topSearchChangedNotification(List<String> topSearches) {
         super.topSearchChangedNotification(topSearches);
         System.out.println("Top search changed.");
         print("Top search terms list is:", getTopSearches());
     }
 
-    private void print(String title, Set<String> lines) {
+    private void print(String title, Collection<String> list) {
         System.out.println(title);
-        for (String line : lines) {
+        for (String line : list) {
             System.out.println(line);
         }
         System.out.println("");

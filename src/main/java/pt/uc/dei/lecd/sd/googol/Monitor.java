@@ -5,7 +5,9 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Monitor extends UnicastRemoteObject implements InterfaceMonitor {
@@ -13,12 +15,12 @@ public class Monitor extends UnicastRemoteObject implements InterfaceMonitor {
     private HashSet<String> downloaders;
     private GoogolRegistry registry;
     private HashSet<String> barrels;
-    private Set<String> topSearches;
+    private List<String> topSearches;
 
     public Monitor() throws RemoteException {
         downloaders = new HashSet<>();
         barrels = new HashSet<>();
-        topSearches = new HashSet<>();
+        topSearches = new ArrayList<>();
     }
 
     public void connect(String host, int port) throws RemoteException, AlreadyBoundException {
@@ -52,11 +54,11 @@ public class Monitor extends UnicastRemoteObject implements InterfaceMonitor {
     }
 
     @Override
-    public void topSearchChangedNotification(Set<String> topSearches) {
+    public void topSearchChangedNotification(List<String> topSearches) {
         this.topSearches = topSearches;
     }
 
-    Set<String> getTopSearches() {
+    List<String> getTopSearches() {
         return topSearches;
     }
 

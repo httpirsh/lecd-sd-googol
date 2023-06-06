@@ -3,22 +3,27 @@
 
 <head>
     <title>Googol</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital@1&family=Space+Mono&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <form>
-        <div id="box1">
-            <h1>Googol</h1>
-            <label for="search"></label>
-            <input type="text" id="search" name="search" placeholder="..." th:value="${search}">
+    <h1>Googol Search:</h1>
+    <form action="/search" method="GET">
+        <label>Enter search terms:</label>
+        <input type="text" name="query"/>
+        <button type="submit">Search</button>
+    </form>      
 
-            <a href="https://www.google.com" target="_self" title="go to google">
-                <button style="background-color: lightskyblue;color:rgb(41, 40, 40);border-radius:5px" type="submit">Search</button>
-            </a>
-        </div>
+    <h1>Googol Index Page:</h1>
+    <form action="/index" method="POST">
+        <label>Enter page url:</label>
+        <input type="text" name="url"/>
+        <button type="submit">Index</button>
     </form>
+
+    <h1>Googol Monitor:</h1>
+    <a href="/monitor" target="_blank">Click here to open the Googol Monitor Page</a>
+
 </body>
+
 
 </html>

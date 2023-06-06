@@ -272,10 +272,10 @@ public class GoogolRegistry {
         return entries.contains(MONITOR_NAME);
     }
 
-    public void topSearchChangedNotification(Set<String> topSearches) throws MalformedURLException, RemoteException, NotBoundException {
+    public void topSearchChangedNotification(List<String> newTopSearches) throws MalformedURLException, RemoteException, NotBoundException {
         if (monitorIsActive()) {
             InterfaceMonitor admin = lookupMonitor();
-            admin.topSearchChangedNotification(topSearches);
+            admin.topSearchChangedNotification(newTopSearches);
         }
     }
 

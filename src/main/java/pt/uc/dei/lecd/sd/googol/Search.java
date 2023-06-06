@@ -31,7 +31,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	private final List<String> searchLogs;
 	private static final long serialVersionUID = 1L;
 	private GoogolRegistry registry;
-	private final Set<String> topSearches;
+	private final List<String> topSearches;
 
 	/**
 	 * O método main da classe tem a responsabilidade de iniciar o RMI Search Module, que permite
@@ -49,7 +49,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 */
 	public Search() throws MalformedURLException, NotBoundException, RemoteException {
 		this.searchLogs = new ArrayList<>();
-		this.topSearches = new HashSet<>();
+		this.topSearches = new ArrayList<>();
 	}
 
 	/**
@@ -131,6 +131,9 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 			newTopSearches.add(sortedTerms.get(i).getKey());
 		}
 
+		topSearches.clear();
+		topSearches.addAll(newTopSearches);
+
 		registry.topSearchChangedNotification(newTopSearches);
 	}
 
@@ -185,7 +188,7 @@ public class Search extends UnicastRemoteObject implements InterfaceSearchModule
 	 * para obter a contagem de frequência de cada termo de busca e, em seguida, classifica esses termos por ordem decrescente de frequência.
 	 * Depois extrai os 10 termos mais frequentes e retorna-os numa lista de strings.
 	 */
-	public Set<String> getTopSearches() throws RemoteException {
+	public List<String> getTopSearches() throws RemoteException {
 		return this.topSearches;
 	}
 

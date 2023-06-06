@@ -81,7 +81,7 @@ public class RmiClient {
 
 				case 3:
 					// pagina admistrativa
-					Set<String> top10 = search.getTopSearches();
+					List<String> top10 = search.getTopSearches();
 					System.out.println("O top de termos de pesquisa:");
 					for (String search : top10) {
 						System.out.println(search);

@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -45,7 +46,7 @@ public class SearchModuleTests {
             }
         }
 
-        Set<String> topSearches = victim.getTopSearches();
+        List<String> topSearches = victim.getTopSearches();
         log.info("SearchModule getTopSearches returned {}", topSearches);
 
         assertAll("Os mais pesquisados devem ser os pares.",

@@ -3,6 +3,7 @@ package pt.uc.dei.lecd.sd.googol;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Set;
 
 public interface InterfaceMonitor extends Remote {
     public void downloaderNotification(String name) throws RemoteException;
@@ -11,10 +12,10 @@ public interface InterfaceMonitor extends Remote {
 
     public void topSearchChangedNotification(List<String> newTopSearches) throws RemoteException;
 
-    public Object getDownloadersNames() throws RemoteException;
+    public Set<String> getDownloadersNames() throws RemoteException;
 
-    public Object getBarrelsNames() throws RemoteException;
+    public Set<String> getBarrelsNames() throws RemoteException;
 
-    public Object getTopSearches() throws RemoteException;
+    public List<String> getTopSearches() throws RemoteException;
 
 }

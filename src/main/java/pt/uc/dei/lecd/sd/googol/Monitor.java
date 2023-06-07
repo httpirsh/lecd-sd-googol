@@ -33,11 +33,11 @@ public class Monitor extends UnicastRemoteObject implements InterfaceMonitor {
         registry.unbind(this);
     }
 
-    Set<String> getBarrelsNames() {
+    public Set<String> getBarrelsNames() {
         return barrels;
     }
 
-    Set<String> getDownloadersNames() {
+    public Set<String> getDownloadersNames() {
         return downloaders;
     }
 
@@ -58,7 +58,7 @@ public class Monitor extends UnicastRemoteObject implements InterfaceMonitor {
         this.topSearches = topSearches;
     }
 
-    List<String> getTopSearches() {
+    public List<String> getTopSearches() {
         return topSearches;
     }
 

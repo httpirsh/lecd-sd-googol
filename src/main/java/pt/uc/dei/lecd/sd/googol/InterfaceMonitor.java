@@ -11,4 +11,10 @@ public interface InterfaceMonitor extends Remote {
 
     public void topSearchChangedNotification(List<String> newTopSearches) throws RemoteException;
 
+    public Object getDownloadersNames() throws RemoteException;
+
+    public Object getBarrelsNames() throws RemoteException;
+
+    public Object getTopSearches() throws RemoteException;
+
 }

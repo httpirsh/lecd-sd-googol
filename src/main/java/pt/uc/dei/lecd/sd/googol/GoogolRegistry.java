@@ -259,7 +259,7 @@ public class GoogolRegistry {
         }
     }
 
-    private InterfaceMonitor lookupMonitor() throws MalformedURLException, RemoteException, NotBoundException {
+    InterfaceMonitor lookupMonitor() throws MalformedURLException, RemoteException, NotBoundException {
         return (InterfaceMonitor) Naming.lookup(getMonitorUri());
     }
 

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class WebServerController {
 
     @GetMapping(value = "/monitor")
-    public String monitor(Model model) {
-        Monitor monitor = WebServer.getMonitor();
+    public String monitor(Model model) throws MalformedURLException, RemoteException, NotBoundException {
+        InterfaceMonitor monitor = WebServer.getRegistry().lookupMonitor();
         model.addAttribute("downloaders", monitor.getDownloadersNames());
         model.addAttribute("barrels", monitor.getBarrelsNames());
         model.addAttribute("topsearches", monitor.getTopSearches());

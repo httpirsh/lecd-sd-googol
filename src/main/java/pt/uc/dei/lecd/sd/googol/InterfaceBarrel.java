@@ -32,13 +32,9 @@ public interface InterfaceBarrel extends Remote {
 
 	HashSet<String> searchTerms(String terms) throws RemoteException;
 
-	HashSet<String> sortImp(HashSet<String> results) throws RemoteException;
-
 	String getPageTitle(String url) throws RemoteException;
 
 	String getShortQuote(String url) throws RemoteException;
-
-	String ping() throws RemoteException;
 
 	public ArrayList<String> getPagesWithLinkTo(String url) throws RemoteException;
 

@@ -163,7 +163,7 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
      * Para garantir que os URLs não sejam adicionados duas vezes, o método verifica se o URL em
      * análise não está no HashSet de URLs ordenados, utilizando o método "contains".
      */
-    public HashSet <String> sortImp(HashSet <String> results) {
+    private HashSet <String> sortImp(HashSet <String> results) {
     	HashSet <String> sortedImp = new HashSet<>();
         int max;
         String greaterImportance;
@@ -181,7 +181,7 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
                     greaterImportance = result;
                 }
     		}
-    	sortedImp.add(greaterImportance);
+    	    sortedImp.add(greaterImportance);
     	}
     	return sortedImp;
     }
@@ -231,11 +231,6 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
             }
         }
         return pagesWithLink;
-    }
-    @Override
-    public String ping() {
-        log.info("ping was called, answering pong.");
-        return "pong";
     }
 
     public boolean start(String host, int port) throws MalformedURLException, NotBoundException {

@@ -171,7 +171,6 @@ public class Barrel extends UnicastRemoteObject implements InterfaceBarrel{
     		max = 0;
     		greaterImportance = "";
     		for(String result: results) {
-                log.info("sortedImp is {} and pageLinkCounts is {} and result is {}", sortedImp, pageLinkCounts, result);
     			if(!sortedImp.contains(result) && pageLinks.containsKey(result) && pageLinkCounts.containsKey(result) && pageLinkCounts.get(result) >= max) {
     				max = pageLinkCounts.get(result);
     				greaterImportance = result;

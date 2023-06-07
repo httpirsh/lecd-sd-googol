@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 
 public class ConsoleMonitor extends Monitor {
 

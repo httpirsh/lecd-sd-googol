@@ -2,17 +2,15 @@
 Googol: Motor de pesquisa de páginas Web.
 
 Como executar o projeto:
-* Para correr as várias funcionalidades é necessário escrever no terminal "java -jar ", seguido da funcionalidade desejada. Para correr qualquer outra, sejam barrels ou downloaders, é necessário abrir outro terminal de modo a correrem em paralelo.
-
-A aplicação Googol primeiro (Googol Cluster), de modo a inicializar e configurar os componentes da aplicação, os quais 2 downloaders e 2 barrels.
-Numa fase seguinte, basta correr a classe GoogolClient, que inicia um RmiClient e connecta-o com o cluster. 
-No RmiClient será pedido ao utilizador as suas informações e respetivas intenções, através de um menu.
+* Abrir uma página web (localhost:8080) de modo a visualizar os htmls necessários.
+* Arrancar o rmiregistry na pasta das classes, através do comando "cd target/classes" no terminal, seguido de "rmiregistry".
+* Correr o componente "WebServer", seguido de um barrel, downloader e queue. Caso não seja possível a visualização clara da indexação de links na queue, poderemos para o downloader.
+* Na página Googol na web, poderemos visualizar as várias funcionalidades da aplicação.
 
 
 Este projeto teve como objetivo desenvolver um motor de pesquisa de páginas web, capaz de oferecer diversas 
 funcionalidades aos seus utilizadores. 
-* O motor de pesquisa implementado permite a pesquisa de páginas que contenham um conjunto de termos, utilizando para
-isso um índice invertido. A lista de páginas que contêm todos os termos da pesquisa é apresentada ordenada por
+* O motor de pesquisa implementado permite a pesquisa de páginas que contenham um conjunto de termos, utilizando para isso um índice invertido. A lista de páginas que contêm todos os termos da pesquisa é apresentada ordenada por
 importância, considerando que uma página é mais relevante se tiver mais ligações de outras páginas.
 * Cada resultado da pesquisa apresenta o título da página, o URL completo e uma citação curta composta por texto da 
 página. Para além dessas informações, se o utilizador estiver registado e com login efetuado, são também apresentadas 
